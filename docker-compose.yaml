@@ -1,0 +1,89 @@
+volumes:
+  db-data:
+  static_volume:
+
+services:
+  # ----------------------------------------------------------------------------
+  # nginx proxy server
+  # ----------------------------------------------------------------------------
+  service.nginx:
+    build:
+      context: .
+      dockerfile: ./settings/docker/Dockerfile.nginx
+    ports:
+      - 1337:80
+    depends_on:
+      - service.frontend
+    volumes:
+      - static_volume:/usr/share/nginx/html/static
+    restart: unless-stopped
+
+  # ----------------------------------------------------------------------------
+  # nuxt frontend
+  # ----------------------------------------------------------------------------
+  service.frontend:
+    build:
+      context: .
+      dockerfile: ./settings/docker/Dockerfile.frontend
+    command: "npm run dev -- -o"
+    expose:
+      - 3000
+      - 24678:24678
+    volumes:
+      - ./frontend:/app
+    env_file:
+      - ./settings/env/.env.frontend
+    restart: unless-stopped
+
+  # ----------------------------------------------------------------------------
+  # django backend
+  # ----------------------------------------------------------------------------
+  service.backend:
+    build:
+      context: .
+      dockerfile: ./settings/docker/Dockerfile.backend
+    expose:
+      - 8000
+    ports:
+      - 8000  
+    volumes:
+      - ./backend:/app
+      - static_volume:/app/static
+    env_file:
+      - ./settings/env/.env.backend
+    depends_on:
+      - service.db_postgres
+    restart: unless-stopped
+    command: >
+      sh -c "./run_before.sh
+      && pipenv run gunicorn -c gunicorn.py avito.wsgi"
+
+  # ----------------------------------------------------------------------------
+  # database
+  # ----------------------------------------------------------------------------
+  service.db_postgres:
+    image: postgres
+    expose:
+      - 5432
+    ports:
+      - 5432:5432
+    volumes:
+      # - db-data:/var/lib/postgresql/data
+      - db-data:/var/lib/postgresql/MAJOR/docker
+    env_file:
+      - ./settings/env/.env.backend
+    restart: unless-stopped
+
+  # ----------------------------------------------------------------------------
+  # adminer
+  # ----------------------------------------------------------------------------
+  service.adminer:
+    image: adminer
+    depends_on:
+      - service.db_postgres
+    ports:
+      - 8080:8080
+    environment:
+      ADMINER_DEFAULT_SERVER:  service.db_postgres
+    restart: unless-stopped
+
