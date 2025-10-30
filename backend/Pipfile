@@ -9,6 +9,7 @@ djangorestframework = "*"
 gunicorn = "*"
 gevent = "*"
 python-dotenv = "*"
+mypy = "*"
 
 [dev-packages]
 
