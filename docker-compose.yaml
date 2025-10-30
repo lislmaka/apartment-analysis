@@ -2,6 +2,9 @@ volumes:
   db-data:
   static_volume:
 
+networks:
+  internal-net:
+
 services:
   # ----------------------------------------------------------------------------
   # nginx proxy server
@@ -17,6 +20,8 @@ services:
     volumes:
       - static_volume:/usr/share/nginx/html/static
     restart: unless-stopped
+    networks:
+      - internal-net
 
   # ----------------------------------------------------------------------------
   # nuxt frontend
@@ -34,6 +39,8 @@ services:
     env_file:
       - ./settings/env/.env.frontend
     restart: unless-stopped
+    networks:
+      - internal-net
 
   # ----------------------------------------------------------------------------
   # django backend
@@ -54,6 +61,8 @@ services:
     depends_on:
       - service.db_postgres
     restart: unless-stopped
+    networks:
+      - internal-net
     command: >
       sh -c "./run_before.sh
       && pipenv run gunicorn -c gunicorn.py avito.wsgi"
