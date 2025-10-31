@@ -10,6 +10,7 @@ gunicorn = "*"
 gevent = "*"
 python-dotenv = "*"
 mypy = "*"
+django-debug-toolbar = "*"
 
 [dev-packages]
 
