@@ -5,4 +5,16 @@ from website.models import Avito
 class WebsiteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Avito
-        fields = ("title", "url", "address")
+        fields = [
+            "id",
+            "title",
+            "url",
+            "address",
+            "price",
+            "kolichestvo_komnat",
+            "obshchaya_ploshchad",
+            "god_postroyki",
+            "kapremont_date",
+            "etazh_val",
+            "etazh_count"
+        ]

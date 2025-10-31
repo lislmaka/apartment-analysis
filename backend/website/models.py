@@ -9,7 +9,11 @@ from django.db import models
 
 
 class Avito(models.Model):
-    id = models.BigIntegerField(blank=False, null=False, unique=True, primary_key=True)
+    # id = models.BigAutoField(primary_key=True)
+    # id = models.CharField(blank=True, null=True, verbose_name="ID объявления")
+    id = models.BigAutoField(
+        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+    )
     url = models.TextField(blank=True, null=True, verbose_name="Url адрес")
     date_add = models.CharField(
         blank=True, null=True, max_length=50, verbose_name="Дата добавления"
@@ -18,13 +22,13 @@ class Avito(models.Model):
         blank=True, null=True, max_length=50, verbose_name="Дата обновления"
     )
     title = models.TextField(blank=True, null=True, verbose_name="Заголовок")
-    price = models.BigIntegerField(blank=True, null=True, verbose_name="Цена")
+    price = models.CharField(blank=True, null=True, max_length=20, verbose_name="Цена")
     address = models.TextField(blank=True, null=True, verbose_name="Адрес")
     seller = models.CharField(
         blank=True, null=True, max_length=250, verbose_name="Продавец"
     )
-    kolichestvo_komnat = models.IntegerField(
-        blank=True, null=True, verbose_name="Кол-во комнат"
+    kolichestvo_komnat = models.CharField(
+        blank=True, null=True, max_length=20, verbose_name="Кол-во комнат"
     )
     obshchaya_ploshchad = models.FloatField(
         blank=True, null=True, verbose_name="Общая площадь"
@@ -56,27 +60,23 @@ class Avito(models.Model):
     sanuzel = models.CharField(
         blank=True, null=True, max_length=250, verbose_name="Санузел"
     )
-    okna = models.CharField(
-        blank=True, null=True, max_length=250, verbose_name="Окна"
-    )
+    okna = models.CharField(blank=True, null=True, max_length=250, verbose_name="Окна")
     remont = models.TextField(blank=True, null=True)
     mebel = models.TextField(blank=True, null=True)
     sposob_prodazhi = models.TextField(blank=True, null=True)
     vid_sdelki = models.TextField(blank=True, null=True)
     tip_doma = models.TextField(blank=True, null=True)
-    god_postroyki = models.CharField(
-        blank=True, null=True, max_length=50, verbose_name="Год постройки дома"
-    )
+    god_postroyki = models.CharField(blank=True, null=True, max_length=20,  verbose_name="Год")
     kapremont_date = models.CharField(
-        blank=True, null=True, max_length=50, verbose_name="Дата капремонта"
+        blank=True, null=True, max_length=20, verbose_name="Капремонт"
     )
     etazhey_v_dome = models.TextField(blank=True, null=True)
     passazhirskiy_lift = models.TextField(blank=True, null=True)
     gruzovoy_lift = models.TextField(blank=True, null=True)
     dvor = models.TextField(blank=True, null=True)
     parkovka = models.TextField(blank=True, null=True)
-    etazh_val = models.IntegerField(blank=True, null=True, verbose_name="Этаж")
-    etazh_count = models.IntegerField(blank=True, null=True, verbose_name="Этажей")
+    etazh_val = models.CharField(blank=True, null=True, max_length=20, verbose_name="Этаж")
+    etazh_count = models.CharField(blank=True, null=True, max_length=20, verbose_name="Этажей")
     to_magazin = models.TextField(blank=True, null=True)
     to_pyaterochka = models.TextField(blank=True, null=True)
     to_magnit = models.TextField(blank=True, null=True)

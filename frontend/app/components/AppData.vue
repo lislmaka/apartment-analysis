@@ -1,11 +1,4 @@
-<template>
-  <div>
-    <NuxtLayout>
-      <NuxtPage />
-    </NuxtLayout>
-  </div>
-</template>
-<!-- <script setup lang="ts">
+<script setup lang="ts">
 const { data, pending, error } = await useFetch('http://service.backend:8000/api/')
 </script>
 
@@ -15,4 +8,4 @@ const { data, pending, error } = await useFetch('http://service.backend:8000/api
          <p v-if="pending">Loading...</p>  
       <p v-if="error">{{ error.message }}</p>  
    </div>  
-</template>  -->
+</template> 
