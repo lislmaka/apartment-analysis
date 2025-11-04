@@ -1,23 +1,451 @@
 from django.utils.html import format_html
 
 
-def show_info(instance):
-    return format_html(
-        """<div>{}<br>{}<br>{}</div>""",
-        instance.id,
-        instance.title,
-        instance.address
+def show_info33(instance):
+    infrastructure_info = show_infrastructure_info(instance)
+    house_info = show_house_info(instance)
+    flat_info = show_house_flat(instance)
+    descriptions = show_description(instance)
+    general_info = show_general_info(instance)
+    lmaps = maps(instance)
+
+    # display: inline-block; background-color: #f2f2f2;
+    to_obj = """<div style="">{} {} {} {} {} {}</div>""".format(
+        lmaps,
+        general_info,
+        infrastructure_info,
+        house_info,
+        flat_info,
+        descriptions,
     )
+    to_obj_html = format_html(to_obj)
+    return to_obj_html
 
 
-def maps(instance):
+def show_item(background_color, title, value):
+    rez = """<span style="
+    display: inline-block; 
+    background-color: {}; 
+    color: black; 
+    padding: 3px; 
+    margin: 3px;">
+    {} {}
+    </span>""".format(background_color, title, value)
+
+    return rez
+
+
+def show_description(instance):
+    html_desc = ""
+    html_desc_minus = ""
+    if instance.description and len(instance.description) > 10:
+        html_desc = format_html(
+            """<div style="background-color: #ccffcc; border: 1px solid #ccffcc; padding: 5px; margin-bottom:3px;">{}</div>""",
+            # """<div style="width: 250px;">{}</div>""",
+            format_html(instance.description),
+        )
+
+    if instance.description_minus and len(instance.description_minus) > 10:
+        html_desc_minus = format_html(
+            """<div style="background-color: #ffe6e6; border: 1px solid #ffe6e6; padding: 5px;">{}</div>""",
+            # """<div style="width: 250px;">{}</div>""",
+            format_html(instance.description_minus),
+        )
+    return format_html("{} {}", html_desc, html_desc_minus)
+
+
+def calc_item_infrastructure(
+    obj,
+    title,
+    rating_infrastructure,
+    rating_infrastructure_deliveris,
+    rating_infrastructure_mags,
+    distance=500,
+):
+    background_color = ""
+    if obj:
+        if int(obj) <= distance and (title in rating_infrastructure):
+            background_color = "#00e600"
+        elif int(obj) > distance and (title in rating_infrastructure):
+            background_color = "#ffb3b3"
+        elif int(obj) <= distance:
+            background_color = "#b3b3ff"
+        else:
+            background_color = "#ffe0b3"
+        return show_item(background_color, title, obj)
+    else:
+        if (
+            title in rating_infrastructure
+            and title not in rating_infrastructure_deliveris
+            and title not in rating_infrastructure_mags
+        ):
+            background_color = "#ffb3b3"
+            return show_item(background_color, title, "")
+        # elif (
+        #     title in rating_infrastructure
+        #     and title not in rating_infrastructure_mags
+        # ):
+        #     background_color = "#ffb3b3"
+        #     return show_item(background_color, title, "")
+        else:
+            return ""
+
+
+def calc_item_house(obj, title):
+    background_color = ""
+    if obj:
+        background_color = "#00e600"
+    else:
+        background_color = "#ffb3b3"
+    return show_item(background_color, title, "")
+
+
+def calc_item_flat(obj, title):
+    background_color = ""
+    if obj:
+        background_color = "#00e600"
+    else:
+        background_color = "#ffb3b3"
+    return show_item(background_color, title, "")
+
+
+def show_house_flat(instance):
+    d = {
+        "is_kuxnya": {
+            "title": "Кухня",
+            "instance": instance.is_kuxnya,
+            "rez": None,
+        },
+        "is_tualet": {
+            "title": "Туалет",
+            "instance": instance.is_tualet,
+            "rez": None,
+        },
+        "is_vana": {
+            "title": "Ванна",
+            "instance": instance.is_vana,
+            "rez": None,
+        },
+        "is_balkon": {
+            "title": "Балкон",
+            "instance": instance.is_balkon,
+            "rez": None,
+        },
+    }
+    for item in d:
+        d[item]["rez"] = calc_item_flat(d[item]["instance"], d[item]["title"])
+
+    to_obj = """<div style="">{} {} {} {} {}</div>""".format(
+        show_item("#cccccc", "Квартира", ""),
+        d["is_kuxnya"]["rez"],
+        d["is_tualet"]["rez"],
+        d["is_vana"]["rez"],
+        d["is_balkon"]["rez"],
+    )
+    to_obj_html = format_html(to_obj)
+
+    return format_html(to_obj_html)
+
+
+def show_house_info(instance):
+    d = {
+        "is_kapremont": {
+            "title": "Капремонт",
+            "instance": instance.is_kapremont,
+            "rez": None,
+        },
+        "is_no_stupenki": {
+            "title": "Ступеньки",
+            "instance": instance.is_no_stupenki,
+            "rez": None,
+        },
+        "is_musoroprovod": {
+            "title": "Мусоропровод",
+            "instance": instance.is_musoroprovod,
+            "rez": None,
+        },
+        "is_new_lift": {
+            "title": "Лифт",
+            "instance": instance.is_new_lift,
+            "rez": None,
+        },
+    }
+    for item in d:
+        d[item]["rez"] = calc_item_house(d[item]["instance"], d[item]["title"])
+
+    to_obj = """<div style="">{} {} {} {} {}</div>""".format(
+        show_item("#cccccc", "Дом", ""),
+        d["is_kapremont"]["rez"],
+        d["is_no_stupenki"]["rez"],
+        d["is_musoroprovod"]["rez"],
+        d["is_new_lift"]["rez"],
+    )
+    to_obj_html = format_html(to_obj)
+
+    return format_html(to_obj_html)
+
+
+def show_infrastructure_info(instance):
+    distance = 500
+    rating_infrastructure = [
+        # "Магазин",
+        "Пятерочка",
+        "Магнит",
+        "Аптека",
+        "Ozon",
+        "WB",
+        "YM",
+    ]
+    rating_infrastructure_deliveris = [
+        "Ozon",
+        "WB",
+        "YM",
+    ]
+    rating_infrastructure_mags = [
+        "Пятерочка",
+        "Магнит",
+    ]
+    d = {
+        "to_magazin": {
+            "title": "Магазин",
+            "instance": instance.to_magazin,
+            "rez": None,
+        },
+        "to_pyaterochka": {
+            "title": "Пятерочка",
+            "instance": instance.to_pyaterochka,
+            "rez": None,
+        },
+        "to_magnit": {
+            "title": "Магнит",
+            "instance": instance.to_magnit,
+            "rez": None,
+        },
+        "to_bolnitsa": {
+            "title": "Больница",
+            "instance": instance.to_bolnitsa,
+            "rez": None,
+        },
+        "to_pochta": {
+            "title": "Почта",
+            "instance": instance.to_pochta,
+            "rez": None,
+        },
+        "to_bank": {
+            "title": "Банк",
+            "instance": instance.to_bank,
+            "rez": None,
+        },
+        "to_apteka": {
+            "title": "Аптека",
+            "instance": instance.to_apteka,
+            "rez": None,
+        },
+        "to_ozon": {
+            "title": "Ozon",
+            "instance": instance.to_ozon,
+            "rez": None,
+        },
+        "to_wildberries": {
+            "title": "WB",
+            "instance": instance.to_wildberries,
+            "rez": None,
+        },
+        "to_yandex": {
+            "title": "YD",
+            "instance": instance.to_yandex,
+            "rez": None,
+        },
+    }
+
+    mags_sum = []
+    mags_avg = ""
+    if d["to_pyaterochka"]["instance"]:
+        mags_sum.append(int(d["to_pyaterochka"]["instance"]))
+    if d["to_magnit"]["instance"]:
+        mags_sum.append(int(d["to_magnit"]["instance"]))
+    if mags_sum:
+        mags_avg = int(sum(mags_sum) / len(mags_sum))
+
+    delivery_sum = []
+    delivery_avg = ""
+    if d["to_ozon"]["instance"]:
+        delivery_sum.append(int(d["to_ozon"]["instance"]))
+    if d["to_wildberries"]["instance"]:
+        delivery_sum.append(int(d["to_wildberries"]["instance"]))
+    if d["to_yandex"]["instance"]:
+        delivery_sum.append(int(d["to_yandex"]["instance"]))
+    if delivery_sum:
+        delivery_avg = int(sum(delivery_sum) / len(delivery_sum))
+
+    deliverys_item = show_item("#ffb3b3", "Доставка", delivery_avg)
+    mags_item = show_item("#ffb3b3", "Сетевые", mags_avg)
+    for item in d:
+        d[item]["rez"] = calc_item_infrastructure(
+            d[item]["instance"],
+            d[item]["title"],
+            rating_infrastructure,
+            rating_infrastructure_deliveris,
+            rating_infrastructure_mags,
+            distance,
+        )
+        if (
+            d[item]["title"] in rating_infrastructure_deliveris
+            and d[item]["rez"]
+            and int(d[item]["instance"]) <= distance
+        ):
+            deliverys_item = show_item("#00e600", "Доставка", delivery_avg)
+        if (
+            d[item]["title"] in rating_infrastructure_mags
+            and d[item]["rez"]
+            and int(d[item]["instance"]) <= distance
+        ):
+            mags_item = show_item("#00e600", "Сетевые", mags_avg)
+
+    to_obj = """<div style="">{} {} {} {} {} {} {} {}</div>""".format(
+        show_item("#cccccc", "Инфраструктура", ""),
+        # d["to_magazin"]["rez"],
+        # d["to_pyaterochka"]["rez"],
+        # d["to_magnit"]["rez"],
+        mags_item,
+        d["to_apteka"]["rez"],
+        deliverys_item,
+        d["to_magazin"]["rez"],
+        d["to_bolnitsa"]["rez"],
+        d["to_pochta"]["rez"],
+        d["to_bank"]["rez"],
+    )
+    to_obj_html = format_html(to_obj)
+
+    return format_html(to_obj_html)
+
+
+def show_general_info(instance):
+    # show_item("#e6e6e6", instance.tip_doma.capitalize(), "")
+    dop_info = []
+
+    # if instance.review_results == 1:
+    #     dop_info.append(show_item("#e6e6e6", instance.get_review_results_display(), ""))
+    # elif instance.review_results == 2:
+    #     dop_info.append(show_item("#00e600", instance.get_review_results_display(), ""))
+    # else:
+    #     dop_info.append(show_item("#ffb3b3", instance.get_review_results_display(), ""))
+    address = instance.address.split(",")
+    dop_info.append(
+        show_item("#e6e6e6", f"{address[-3]}, {address[-2]}, {address[-1]}", "")
+    )
+    if instance.district:
+        dop_info.append(show_item("#e6e6e6", instance.district, ""))
+    if instance.tip_doma:
+        dop_info.append(show_item("#e6e6e6", instance.tip_doma.capitalize(), ""))
+
+    return format_html("".join(map(str, dop_info)))
+
+
+def show_info(instance):
+    html_desc = ""
+    html_desc_minus = ""
+    dop_info = [instance.id]
+    if instance.district:
+        dop_info.append(f"р-н {instance.district}")
+    if instance.tip_doma:
+        dop_info.append(f"{instance.tip_doma.capitalize()}")
+
+    if instance.description and len(instance.description) > 10:
+        html_desc = format_html(
+            """<div style="border-left: 5px solid #00e600; padding: 5px; margin-bottom:3px;">{}</div>""",
+            # """<div style="width: 250px;">{}</div>""",
+            instance.description,
+        )
+
+    if instance.description_minus and len(instance.description_minus) > 10:
+        html_desc_minus = format_html(
+            """<div style="border-left: 5px solid #ff944d; padding: 5px;">{}</div>""",
+            # """<div style="width: 250px;">{}</div>""",
+            instance.description_minus,
+        )
+
+    # ------------------------
+    to_obj = ""
+    to_obj_begin = """<div style="display: flex;">"""
+
+    if instance.to_magazin:
+        if int(instance.to_magazin) <= 500:
+            to_magazin = f'<span style="background-color: green; color: white; padding: 3px; margin-right: 3px;">Магазин {instance.to_magazin}</span>'
+        else:
+            to_magazin = f'<span style="background-color: #ffb3b3; color: black; padding: 3px; margin-right: 3px;">Магазин {instance.to_magazin}</span>'
+    else:
+        to_magazin = ""
+
+    if instance.to_pyaterochka:
+        if int(instance.to_pyaterochka) <= 500:
+            to_pyaterochka = f'<span style="background-color: green; color: white; padding: 3px; margin-right: 3px;">Пятерочка {instance.to_pyaterochka}</span>'
+        else:
+            to_pyaterochka = f'<span style="background-color: #ffb3b3; color: black; padding: 3px; margin-right: 3px;">Пятерочка {instance.to_pyaterochka}</span>'
+    else:
+        to_pyaterochka = ""
+
+    if instance.to_magnit:
+        if int(instance.to_magnit) <= 500:
+            to_magnit = f'<span style="background-color: green; color: white; padding: 3px; margin-right: 3px;">Магнит {instance.to_magnit}</span>'
+        else:
+            to_magnit = f'<span style="background-color: #ffb3b3; color: black; padding: 3px; margin-right: 3px;">Магнит {instance.to_magnit}</span>'
+    else:
+        to_magnit = ""
+
+    if instance.to_bolnitsa:
+        if int(instance.to_bolnitsa) <= 500:
+            to_bolnitsa = f'<span style="background-color: green; color: white; padding: 3px; margin-right: 3px;">Больница {instance.to_bolnitsa}</span>'
+        else:
+            to_bolnitsa = f'<span style="background-color: #ffb3b3; color: black; padding: 3px; margin-right: 3px;">Больница {instance.to_bolnitsa}</span>'
+    else:
+        to_bolnitsa = ""
+
+    if instance.to_pochta:
+        if int(instance.to_pochta) <= 500:
+            to_pochta = f'<span style="background-color: green; color: white; padding: 3px; margin-right: 3px;">Почта {instance.to_pochta}</span>'
+        else:
+            to_pochta = f'<span style="background-color: #ffb3b3; color: black; padding: 3px; margin-right: 3px;">Почта {instance.to_pochta}</span>'
+    else:
+        to_pochta = ""
+
+    if instance.to_bank:
+        if int(instance.to_bank) <= 500:
+            to_bank = f'<span style="background-color: green; color: white; padding: 3px; margin-right: 3px;">Банк {instance.to_bank}</span>'
+        else:
+            to_bank = f'<span style="background-color: #ffb3b3; color: black; padding: 3px; margin-right: 3px;">Банк {instance.to_bank}</span>'
+    else:
+        to_bank = ""
+
+    if instance.to_apteka:
+        if int(instance.to_apteka) <= 500:
+            to_apteka = f'<span style="background-color: green; color: white; padding: 3px; margin-right: 3px;">Аптека {instance.to_apteka}</span>'
+        else:
+            to_apteka = f'<span style="background-color: #ffb3b3; color: black; padding: 3px; margin-right: 3px;">Аптека {instance.to_apteka}</span>'
+    else:
+        to_apteka = ""
+
+    to_obj_end = """</div>"""
+    to_obj = (
+        to_obj_begin
+        + to_magazin
+        + to_pyaterochka
+        + to_magnit
+        + to_bolnitsa
+        + to_pochta
+        + to_bank
+        + to_apteka
+        + to_obj_end
+    )
+    to_obj_html = format_html(to_obj)
+    # ------------------------
     to_hospital = format_html(
         """<a href="#"
     onclick="window.open('https://yandex.ru/maps/?rtext={}~{}&rtt=mt',
                          'newwindow',
                          'width=1100,height=700');
               return false;"
- >&rarr; Больница</a>""",
+ >Больница</a>""",
         instance.address,
         "Брянск, проспект Станке Димитрова, 96",
     )
@@ -28,7 +456,7 @@ def maps(instance):
                          'newwindow',
                          'width=1100,height=700');
               return false;"
- >&rarr; До ЖД</a>""",
+ >До ЖД</a>""",
         instance.address,
         "Брянск, Речная улица, 2А",
     )
@@ -39,7 +467,7 @@ def maps(instance):
                          'newwindow',
                          'width=1100,height=700');
               return false;"
- >&rarr; На карте</a>""",
+ >На карте</a>""",
         instance.address,
     )
 
@@ -49,13 +477,119 @@ def maps(instance):
                          'newwindow',
                          'width=1100,height=700');
               return false;"
- >&rarr; На Avito</a>""",
+ >На {}</a>""",
         instance.url,
+        instance.source_from,
     )
+    to_gkh = format_html(
+        """<a href="#"
+    onclick="window.open('https://my-gkh.ru/houses/searchhouses',
+                         'newwindow',
+                         'width=1100,height=700');
+              return false;"
+ >ЖКХ</a>"""
+    )
+    # ------------------------
     return format_html(
-        """<div>{}<br>{}<br>{}<br>{}</div>""",
+        """<div>{} {} <br> &#8250; {} <br> &#8250; {} &#8250; {} &#8250; {} &#8250; {} &#8250; {} <br> {} {}</div>""",
+        # """<div>{} <br> &#8250; {} <br> &#8250; {} &#8250; {} &#8250; {} &#8250; {} &#8250; {}</div>""",
+        to_obj_html,
+        format_html(" &#8250; ".join(map(str, dop_info))),
+        instance.address,
+        # district,
         to_hospital,
         to_vokzal,
         to_address_on_map,
         to_avito,
+        to_gkh,
+        #
+        html_desc,
+        html_desc_minus,
+    )
+
+
+def maps(instance):
+    to_hospital = format_html(
+        """<a href="#"
+    onclick="window.open('https://yandex.ru/maps/?rtext={}~{}&rtt=mt',
+                         '_blank',
+                         'width=1100,height=700');
+              return false;"
+ >Больница</a>""",
+        instance.address,
+        "Брянск, проспект Станке Димитрова, 96",
+    )
+
+    to_vokzal = format_html(
+        """<a href="#"
+    onclick="window.open('https://yandex.ru/maps/?rtext={}~{}&rtt=mt',
+                         '_blank',
+                         'width=1100,height=700');
+              return false;"
+ >ЖД</a>""",
+        instance.address,
+        "Брянск, Речная улица, 2А",
+    )
+
+    to_address_on_map = format_html(
+        """<a href="#"
+    onclick="window.open('https://yandex.ru/maps/?text={}',
+                         '_blank',
+                         'width=1100,height=700');
+              return false;"
+ >Yandex</a>""",
+        instance.address,
+    )
+
+    to_address_on_map_google = format_html(
+        """<a href="#"
+    onclick="window.open('https://www.google.com/maps/place/{}',
+                         '_blank',
+                         'width=1100,height=700');
+              return false;"
+ >Google</a>""",
+        instance.address,
+    )
+
+    to_avito = format_html(
+        """<a href="#"
+    onclick="window.open('{}',
+                         '_blank',
+                         'width=1100,height=700');
+              return false;"
+ >{}</a>""",
+        instance.url,
+        instance.source_from.capitalize(),
+    )
+
+    to_andreevka = format_html(
+        """<a href="#"
+    onclick="window.open('https://yandex.ru/maps/?rtext={}~{}&rtt=mt',
+                         '_blank',
+                         'width=1100,height=700');
+              return false;"
+ >Андреевка</a>""",
+        instance.address,
+        "Центральная улица, 57, деревня Антоновка, Супоневское сельское поселение, Брянский район",
+    )
+
+    to_edit = format_html(
+        """<a href="#"
+    onclick="window.open('http://localhost:1337/admin/website/avito/{}/change/',
+                         '_blank',
+                         'width=1100,height=700');
+              return false;"
+ >Edit</a>""",
+        instance.id,
+    )
+
+    return format_html(
+        """<div>{} {} {} {} {} {} {}</div>""",
+        format_html(show_item("#e6e6e6", to_hospital, "")),
+        format_html(show_item("#e6e6e6", to_vokzal, "")),
+        format_html(show_item("#e6e6e6", to_avito, "")),
+        format_html(show_item("#e6e6e6", to_andreevka, "")),
+        format_html(show_item("#e6e6e6", to_address_on_map, "")),
+        format_html(show_item("#e6e6e6", to_address_on_map_google, "")),
+        format_html(show_item("#e6e6e6", to_edit, "")),
     )
