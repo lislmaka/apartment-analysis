@@ -15,9 +15,9 @@ def show_info33(instance):
         lmaps,
         record_status,
         general_info,
-        infrastructure_info,
         house_info,
         flat_info,
+        infrastructure_info,
         descriptions,
     )
     to_obj_html = format_html(to_obj)
@@ -42,14 +42,14 @@ def show_description(instance):
     html_desc_minus = ""
     if instance.description and len(instance.description) > 10:
         html_desc = format_html(
-            """<div style="background-color: #ccffcc; border: 1px solid #ccffcc; padding: 5px; margin-bottom:3px;">{}</div>""",
+            """<div style="border-left: 5px solid #ccffcc; padding: 5px; margin-bottom:3px;">{}</div>""",
             # """<div style="width: 250px;">{}</div>""",
             format_html(instance.description),
         )
 
     if instance.description_minus and len(instance.description_minus) > 10:
         html_desc_minus = format_html(
-            """<div style="background-color: #ffe6e6; border: 1px solid #ffe6e6; padding: 5px;">{}</div>""",
+            """<div style="border-left: 5px solid #ffe6e6; padding: 5px;">{}</div>""",
             # """<div style="width: 250px;">{}</div>""",
             format_html(instance.description_minus),
         )
@@ -93,13 +93,16 @@ def calc_item_infrastructure(
             return ""
 
 
-def calc_item_house(obj, title):
+def calc_item_house(obj, title, val):
+    text = ""
+    if val is not None:
+        text = val
     background_color = ""
     if obj:
         background_color = "#00e600"
     else:
         background_color = "#ffb3b3"
-    return show_item(background_color, title, "")
+    return show_item(background_color, title, text)
 
 
 def calc_item_flat(obj, title):
@@ -154,33 +157,39 @@ def show_house_info(instance):
         "is_kapremont": {
             "title": "Капремонт",
             "instance": instance.is_kapremont,
+            "val": instance.kapremont_diff,
             "rez": None,
         },
         "is_no_stupenki": {
             "title": "Ступеньки",
             "instance": instance.is_no_stupenki,
+            "val": None,
             "rez": None,
         },
         "is_musoroprovod": {
             "title": "Мусоропровод",
             "instance": instance.is_musoroprovod,
+            "val": None,
             "rez": None,
         },
         "is_new_lift": {
             "title": "Лифт",
             "instance": instance.is_new_lift,
+            "val": instance.lift_diff,
             "rez": None,
         },
     }
     for item in d:
-        d[item]["rez"] = calc_item_house(d[item]["instance"], d[item]["title"])
+        d[item]["rez"] = calc_item_house(
+            d[item]["instance"], d[item]["title"], d[item]["val"]
+        )
 
     to_obj = """<div style="">{} {} {} {} {}</div>""".format(
         show_item("#cccccc", "Дом", ""),
         d["is_kapremont"]["rez"],
+        d["is_new_lift"]["rez"],
         d["is_no_stupenki"]["rez"],
         d["is_musoroprovod"]["rez"],
-        d["is_new_lift"]["rez"],
     )
     to_obj_html = format_html(to_obj)
 
@@ -304,20 +313,25 @@ def show_infrastructure_info(instance):
         ):
             mags_item = show_item("#00e600", "Сетевые", mags_avg)
 
-    to_obj = """<div style="">{} {} {} {} {} {} {} {}</div>""".format(
+    to_obj_main = """<div style="">{} {} {} {}</div>""".format(
         show_item("#cccccc", "Инфраструктура", ""),
-        # d["to_magazin"]["rez"],
-        # d["to_pyaterochka"]["rez"],
-        # d["to_magnit"]["rez"],
         mags_item,
         d["to_apteka"]["rez"],
         deliverys_item,
+        # d["to_magazin"]["rez"],
+        # d["to_bolnitsa"]["rez"],
+        # d["to_pochta"]["rez"],
+        # d["to_bank"]["rez"],
+    )
+    to_obj_seccond = """<div style="">{} {} {} {}</div>""".format(
         d["to_magazin"]["rez"],
         d["to_bolnitsa"]["rez"],
         d["to_pochta"]["rez"],
         d["to_bank"]["rez"],
     )
-    to_obj_html = format_html(to_obj)
+    to_obj_html = format_html(
+        "{} {}", format_html(to_obj_main), format_html(to_obj_seccond)
+    )
 
     return format_html(to_obj_html)
 
@@ -326,39 +340,40 @@ def show_record_status(instance):
     status = show_item(
         "#e6e6e6", instance.get_record_status_display(), f"[{instance.record_status}]"
     )
-    bg_color  = "#e6e6e6"
+    bg_color = "#e6e6e6"
     if instance.review_results == "2":
-        bg_color  = "#00e600"
+        bg_color = "#00e600"
     elif instance.review_results == "3":
-        bg_color  = "#ffb3b3"
+        bg_color = "#ffb3b3"
 
     review_results = show_item(bg_color, instance.get_review_results_display(), "")
-    return format_html("{} {}", format_html(status), format_html(review_results))
+    return format_html(
+        "<div>{} {}</div>", format_html(status), format_html(review_results)
+    )
 
 
 def show_general_info(instance):
-    # show_item("#e6e6e6", instance.tip_doma.capitalize(), "")
     dop_info = []
-
-    # dop_info.append(instance.get_record_status_display())
-    # if instance.review_results == 1:
-    #     dop_info.append(show_item("#e6e6e6", instance.get_review_results_display(), ""))
-    # elif instance.review_results == 2:
-    #     dop_info.append(show_item("#00e600", instance.get_review_results_display(), ""))
-    # else:
-    #     dop_info.append(show_item("#ffb3b3", instance.get_review_results_display(), ""))
     dop_info.append(show_item("#e6e6e6", instance.id, ""))
 
     address = instance.address.split(",")
-    dop_info.append(
-        show_item("#e6e6e6", f"{address[-3]}, {address[-2]}, {address[-1]}", "")
-    )
+    if instance.source_from == "avito":
+        dop_info.append(
+            # show_item("#e6e6e6", f"{address[-3]}, {address[-2]}, {address[-1]}", "")
+            show_item("#e6e6e6", f"{address[-2]}, {address[-1]}", "")
+        )
+    if instance.source_from == "cian":
+        dop_info.append(
+            # show_item("#e6e6e6", f"{address[2]}, {address[0]}, {address[1]}", "")
+            show_item("#e6e6e6", f"{address[0]}, {address[1]}", "")
+        )
+
     if instance.district:
         dop_info.append(show_item("#e6e6e6", instance.district, ""))
     if instance.tip_doma:
         dop_info.append(show_item("#e6e6e6", instance.tip_doma.capitalize(), ""))
 
-    return format_html("".join(map(str, dop_info)))
+    return format_html("<div>{}</div>", format_html("".join(map(str, dop_info))))
 
 
 def show_info(instance):
@@ -570,6 +585,15 @@ def maps(instance):
         instance.address,
     )
 
+    to_address_on_map_google_all = format_html(
+        """<a href="#"
+    onclick="window.open('https://www.google.com/maps/d/edit?mid=1CqEeIWmaLPMRzZq0li8Mv9vylvzM9YY&usp=sharing',
+                         '_blank',
+                         'width=1100,height=700');
+              return false;"
+ >GoogleAll</a>"""
+    )
+
     to_avito = format_html(
         """<a href="#"
     onclick="window.open('{}',
@@ -591,15 +615,15 @@ def maps(instance):
         instance.address,
     )
 
-    to_edit = format_html(
-        """<a href="#"
-    onclick="window.open('http://localhost:1337/admin/website/avito/{}/change/',
-                         '_blank',
-                         'width=1100,height=700');
-              return false;"
- >Edit</a>""",
-        instance.id,
-    )
+    #     to_edit = format_html(
+    #         """<a href="#"
+    #     onclick="window.open('http://localhost:1337/admin/website/avito/{}/change/',
+    #                          '_blank',
+    #                          'width=1100,height=700');
+    #               return false;"
+    #  >Edit</a>""",
+    #         instance.id,
+    #     )
 
     return format_html(
         """<div>{} {} {} {} {} {} {}</div>""",
@@ -609,5 +633,5 @@ def maps(instance):
         format_html(show_item("#e6e6e6", to_2gis, "")),
         format_html(show_item("#e6e6e6", to_address_on_map, "")),
         format_html(show_item("#e6e6e6", to_address_on_map_google, "")),
-        format_html(show_item("#e6e6e6", to_edit, "")),
+        format_html(show_item("#e6e6e6", to_address_on_map_google_all, "")),
     )

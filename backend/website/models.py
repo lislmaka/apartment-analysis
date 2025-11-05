@@ -158,7 +158,10 @@ class Avito(models.Model):
         blank=True, null=True, max_length=20, verbose_name="Дата капремонт"
     )
     kapremont_diff = models.CharField(
-        blank=True, null=True, max_length=20, verbose_name="Лет до капремонта"
+        blank=True, null=True, max_length=20, verbose_name="Кол-во лет до капремонта"
+    )
+    lift_diff = models.CharField(
+        blank=True, null=True, max_length=20, verbose_name="Кол-во лет до замены лифта"
     )
     lift_date = models.CharField(
         blank=True, null=True, max_length=20, verbose_name="Дата замены лифта"

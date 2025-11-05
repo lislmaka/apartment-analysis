@@ -1,5 +1,7 @@
+import csv
 import datetime
 from django.contrib import admin
+from django.http import HttpResponse
 from website.models import Avito
 from django.db import models
 from django.forms import TextInput, Textarea
@@ -24,19 +26,16 @@ class WebsiteAdmin(admin.ModelAdmin):
         # "description_minus",
         "price",
         # "district",
-        "etazh_val",
-        # "etazh_count",
-        "kolichestvo_komnat",
-        "obshchaya_ploshchad",
-        # "god_postroyki",
+        # "etazh_val",
+        "show_etazh_val",
+        "show_kolichestvo_komnat",
+        "show_obshchaya_ploshchad",
         "show_god_postroyki",
-        # "kapremont_date",
         "short_kapremont_date",
         "show_to_kapremont",
-        # "rating",
-        "show_rating_infrastructure",
-        "show_rating_house",
-        "show_rating_flat",
+        # "show_rating_infrastructure",
+        # "show_rating_house",
+        # "show_rating_flat",
         "show_rating_all",
         "is_active",
         # "show_map_to_main_objects",
@@ -44,7 +43,7 @@ class WebsiteAdmin(admin.ModelAdmin):
         # "url_to_img",
     ]
     save_on_top = True
-    list_display_links = ["show_img"]
+    list_display_links = None
     # list_editable = (
     #     "price",
     #     "etazh_val",
@@ -56,15 +55,22 @@ class WebsiteAdmin(admin.ModelAdmin):
     #     "description",
     #     "description_minus",
     # )
-    readonly_fields = ["is_kapremont", "is_new_lift", "kapremont_diff"]
+    readonly_fields = [
+        "is_kapremont",
+        "is_new_lift",
+        "kapremont_diff",
+        "lift_diff",
+        "address",
+    ]
     actions = [
+        "export_to_csv",
         "make_inactive",
         "make_active",
         # "delete_model",
-        "rating_infrastructure",
-        "rating_house",
-        "rating_flat",
-        "calculate_all_ratings",
+        # "rating_infrastructure",
+        # "rating_house",
+        # "rating_flat",
+        # "calculate_all_ratings",
     ]
 
     formfield_overrides = {
@@ -83,6 +89,18 @@ class WebsiteAdmin(admin.ModelAdmin):
 
     fieldsets = [
         (
+            "Общяя информация",
+            {
+                "fields": [
+                    ("address",),
+                    (
+                        "review_results",
+                        "record_status",
+                    ),
+                ],
+            },
+        ),
+        (
             "Дом (рейтинг)",
             {
                 "fields": [
@@ -97,6 +115,7 @@ class WebsiteAdmin(admin.ModelAdmin):
                         "kapremont_date",
                         "kapremont_diff",
                         "lift_date",
+                        "lift_diff",
                     ),
                 ],
             },
@@ -226,7 +245,23 @@ class WebsiteAdmin(admin.ModelAdmin):
     def show_kolichestvo_komnat(self, instance):
         return instance.kolichestvo_komnat
 
-    show_kolichestvo_komnat.short_description = "Комнат"
+    show_kolichestvo_komnat.short_description = "К"
+    show_kolichestvo_komnat.admin_order_field = "kolichestvo_komnat"
+
+    # etazh_val
+    def show_etazh_val(self, instance):
+        return instance.etazh_val
+
+    show_etazh_val.short_description = "Э"
+    show_etazh_val.admin_order_field = "etazh_val"
+
+
+    #obshchaya_ploshchad
+    def show_obshchaya_ploshchad(self, instance):
+        return instance.obshchaya_ploshchad
+
+    show_obshchaya_ploshchad.short_description = "S"
+    show_obshchaya_ploshchad.admin_order_field = "obshchaya_ploshchad"
 
     #
     def is_active(self, instance):
@@ -246,7 +281,7 @@ class WebsiteAdmin(admin.ModelAdmin):
     def short_kapremont_date(self, instance):
         return instance.kapremont_date
 
-    short_kapremont_date.short_description = "Капремонт"
+    short_kapremont_date.short_description = "КР"
     short_kapremont_date.admin_order_field = "kapremont_date"
 
     # show links to maps
@@ -262,21 +297,34 @@ class WebsiteAdmin(admin.ModelAdmin):
 
     def show_img(self, instance):
         bg_color = ""
-        if instance.review_results == 1:
+        if instance.review_results == "1":
             bg_color = "background-color: #e6e6e6;"
-        elif instance.review_results == 2:
+        elif instance.review_results == "2":
             bg_color = "background-color: #00e600;"
-        elif instance.review_results == 3:
+        elif instance.review_results == "3":
             bg_color = "background-color: #ffb3b3;"
         images_html_begin = '<div style="display: flex; justify-content: center; align-items: center; border-radius: 5px; {}">'.format(
             bg_color
         )
-        images_html = '<img src="/static/flats/{}/main.jpg" width="150" height="150" style="padding: 10px; ">'.format(
+        images_html = '<img src="/static/flats/{}/main.jpg" width="200" height="200" style="padding: 10px; ">'.format(
             instance.id
         )
+        #
+        to_edit = format_html(
+            """<a href="#"
+        onclick="window.open('http://localhost:1337/admin/website/avito/{}/change/',
+                            '_blank',
+                            'width=1100,height=700');
+                return false;"
+    >{}</a>""",
+            instance.id,
+            format_html(images_html),
+        )
+
+        #
         images_html_end = "</div>"
-        images_html = images_html_begin + images_html + images_html_end
-        return format_html(images_html)
+        to_edit = images_html_begin + to_edit + images_html_end
+        return format_html(to_edit)
 
     show_img.short_description = "Фото"
 
@@ -301,6 +349,41 @@ class WebsiteAdmin(admin.ModelAdmin):
         # Вызываем базовый метод с расширенным контекстом
         return super().changelist_view(request, extra_context=extra_context)
 
+    def export_to_csv(self, request, queryset):
+        response = HttpResponse(content_type="text/csv")
+        response["Content-Disposition"] = "attachment; filename=avito.csv"
+        writer = csv.writer(response)
+        writer.writerow(
+            [
+                "Адрес",
+                "Заголовок",
+                "ID",
+                "Цена",
+                "Рейтинг инфраструктуры",
+                "Рейтинг дома",
+                "Рейтинг квартиры",
+                "Рейтинг общий",
+            ]
+        )
+
+        for flat in queryset:
+            writer.writerow(
+                [
+                    flat.address,
+                    flat.title,
+                    flat.id,
+                    flat.price,
+                    flat.rating_infrastructure,
+                    flat.rating_house,
+                    flat.rating_flat,
+                    flat.rating_all,
+                ]
+            )
+
+        return response
+
+    export_to_csv.short_description = "Экспорт CSV"
+
     def make_inactive(self, request, queryset):
         for flat in queryset:
             flat.status = False
@@ -315,53 +398,78 @@ class WebsiteAdmin(admin.ModelAdmin):
 
     make_active.short_description = "Сделать активными"
 
-    def calculate_all_ratings(self, request, queryset):
-        for flat in queryset:
-            rating_infrastructure = calculate_rating_infrastructure(flat)
-            rating_house = calculate_rating_house(flat)
-            rating_flat = calculate_rating_flat(flat)
-            flat.rating_infrastructure = rating_infrastructure
-            flat.rating_house = rating_house
-            flat.rating_flat = rating_flat
-            flat.rating_all = rating_infrastructure + rating_house + rating_flat
-            flat.save()
+    # def calculate_all_ratings(self, request, queryset):
+    #     for flat in queryset:
+    #         rating_infrastructure = calculate_rating_infrastructure(flat)
+    #         rating_house = calculate_rating_house(flat)
+    #         rating_flat = calculate_rating_flat(flat)
+    #         flat.rating_infrastructure = rating_infrastructure
+    #         flat.rating_house = rating_house
+    #         flat.rating_flat = rating_flat
+    #         flat.rating_all = rating_infrastructure + rating_house + rating_flat
+    #         flat.save()
 
-    calculate_all_ratings.short_description = "Пересчитать все рейтинги"
+    # calculate_all_ratings.short_description = "Пересчитать все рейтинги"
 
-    def rating_infrastructure(self, request, queryset):
-        for flat in queryset:
-            flat.rating_infrastructure = calculate_rating_infrastructure(flat)
-            flat.save()
+    # def rating_infrastructure(self, request, queryset):
+    #     for flat in queryset:
+    #         flat.rating_infrastructure = calculate_rating_infrastructure(flat)
+    #         flat.save()
 
-    rating_infrastructure.short_description = "Пересчитать рейтинг инфраструктуры"
+    # rating_infrastructure.short_description = "Пересчитать рейтинг инфраструктуры"
 
-    def rating_house(self, request, queryset):
-        for flat in queryset:
-            flat.rating_house = calculate_rating_house(flat)
-            flat.save()
+    # def rating_house(self, request, queryset):
+    #     for flat in queryset:
+    #         flat.rating_house = calculate_rating_house(flat)
+    #         flat.save()
 
-    rating_house.short_description = "Пересчитать рейтинг дома"
+    # rating_house.short_description = "Пересчитать рейтинг дома"
 
-    def rating_flat(self, request, queryset):
-        for flat in queryset:
-            flat.rating_flat = calculate_rating_flat(flat)
-            flat.save()
+    # def rating_flat(self, request, queryset):
+    #     for flat in queryset:
+    #         flat.rating_flat = calculate_rating_flat(flat)
+    #         flat.save()
 
-    rating_flat.short_description = "Пересчитать рейтинг квартиры"
+    # rating_flat.short_description = "Пересчитать рейтинг квартиры"
 
     class Media:
         js = ("js/admin_overrides.js",)
 
     def save_model(self, request, obj, form, change):
+        years = 5
+        # kapremont
         if "kapremont_date" in request.POST and request.POST["kapremont_date"]:
-            ddiff = int(request.POST["kapremont_date"]) - int(datetime.date.today().strftime("%Y"))
+            ddiff = int(request.POST["kapremont_date"]) - int(
+                datetime.date.today().strftime("%Y")
+            )
             obj.kapremont_diff = ddiff
-            if ddiff >= 5:
+            if ddiff >= years:
                 obj.is_kapremont = True
             else:
                 obj.is_kapremont = False
 
+        # lift
+        if "lift_date" in request.POST and request.POST["lift_date"]:
+            ddiff = int(request.POST["lift_date"]) - int(
+                datetime.date.today().strftime("%Y")
+            )
+            obj.lift_diff = ddiff
+            if ddiff >= years:
+                obj.is_new_lift = True
+            else:
+                obj.is_new_lift = False
+
+        # calculate rating
+        rating_infrastructure = calculate_rating_infrastructure(obj)
+        rating_house = calculate_rating_house(obj)
+        rating_flat = calculate_rating_flat(obj)
+        obj.rating_infrastructure = rating_infrastructure
+        obj.rating_house = rating_house
+        obj.rating_flat = rating_flat
+        obj.rating_all = rating_infrastructure + rating_house + rating_flat
+
         super().save_model(request, obj, form, change)
+
 
 admin.site.register(Avito, WebsiteAdmin)
 # Register your models here.
