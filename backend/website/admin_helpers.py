@@ -635,3 +635,35 @@ def maps(instance):
         format_html(show_item("#e6e6e6", to_address_on_map_google, "")),
         format_html(show_item("#e6e6e6", to_address_on_map_google_all, "")),
     )
+
+
+def show_flat_image(instance):
+        bg_color = ""
+        if instance.review_results == "1":
+            bg_color = "background-color: #e6e6e6;"
+        elif instance.review_results == "2":
+            bg_color = "background-color: #00e600;"
+        elif instance.review_results == "3":
+            bg_color = "background-color: #ffb3b3;"
+        images_html_begin = '<div style="display: flex; justify-content: center; align-items: center; border-radius: 5px; {}">'.format(
+            bg_color
+        )
+        images_html = '<img src="/static/flats/{}/main.jpg" width="200" height="200" style="padding: 10px; ">'.format(
+            instance.id
+        )
+        #
+        to_edit = format_html(
+            """<a href="#"
+        onclick="window.open('http://localhost:1337/admin/website/avito/{}/change/',
+                            '_blank',
+                            'width=1100,height=700');
+                return false;"
+    >{}</a>""",
+            instance.id,
+            format_html(images_html),
+        )
+
+        #
+        images_html_end = "</div>"
+        to_edit = images_html_begin + to_edit + images_html_end
+        return format_html(to_edit)    

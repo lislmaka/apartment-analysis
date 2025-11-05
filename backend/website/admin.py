@@ -8,25 +8,21 @@ from django.forms import TextInput, Textarea
 from django.utils.html import format_html
 
 import website.admin_helpers as myutils
+import website.admin_actions as aa
 from website.admin_ratings import (
     calculate_rating_infrastructure,
     calculate_rating_flat,
     calculate_rating_house,
 )
-import os
-import shutil
-
-# Register your models here.
 
 
 class WebsiteAdmin(admin.ModelAdmin):
+    class Media:
+        js = ("js/admin_overrides.js",)
+        
     list_display = [
         "show_info",
-        # "description",
-        # "description_minus",
         "price",
-        # "district",
-        # "etazh_val",
         "show_etazh_val",
         "show_kolichestvo_komnat",
         "show_obshchaya_ploshchad",
@@ -38,23 +34,10 @@ class WebsiteAdmin(admin.ModelAdmin):
         # "show_rating_flat",
         "show_rating_all",
         "is_active",
-        # "show_map_to_main_objects",
         "show_img",
-        # "url_to_img",
     ]
     save_on_top = True
     list_display_links = None
-    # list_editable = (
-    #     "price",
-    #     "etazh_val",
-    #     "kolichestvo_komnat",
-    #     "obshchaya_ploshchad",
-    #     "kapremont_date",
-    #     "god_postroyki",
-    #     "rating",
-    #     "description",
-    #     "description_minus",
-    # )
     readonly_fields = [
         "is_kapremont",
         "is_new_lift",
@@ -63,14 +46,9 @@ class WebsiteAdmin(admin.ModelAdmin):
         "address",
     ]
     actions = [
-        "export_to_csv",
+        "action_export_csv",
         "make_inactive",
         "make_active",
-        # "delete_model",
-        # "rating_infrastructure",
-        # "rating_house",
-        # "rating_flat",
-        # "calculate_all_ratings",
     ]
 
     formfield_overrides = {
@@ -180,28 +158,13 @@ class WebsiteAdmin(admin.ModelAdmin):
         ),
     ]
 
+    # Удалить sction delete selected
+    # Потом можно вернуть
     def get_actions(self, request):
         actions = super().get_actions(request)
         if "delete_selected" in actions:
             del actions["delete_selected"]
         return actions
-
-    # def delete_model(self, request, obj):
-    #     # 7564501425
-    #     for o in obj.all():
-    #         path_file = f"/home/home/my/RepoCode/avito/parser/html/{o.source_from}_{o.pk}.html"
-    #         path_dir = f"/home/home/my/RepoCode/avito/backend/website/static/flats/{o.pk}"
-    #         print(f"{path_file=}")
-    #         print(f"{path_dir=}")
-    #         if os.path.exists(path_dir) and os.path.isdir(path_dir):
-    #             print("Dir exist")
-    #             shutil.rmtree(path_dir)
-    #         if os.path.exists(path_file):
-    #             print("File exist")
-    #             shutil.rmtree(path_file)
-    #         o.delete()
-
-    # delete_model.short_description = 'Удалить выбранные записи'
 
     def show_god_postroyki(self, instance):
         return instance.god_postroyki
@@ -255,8 +218,7 @@ class WebsiteAdmin(admin.ModelAdmin):
     show_etazh_val.short_description = "Э"
     show_etazh_val.admin_order_field = "etazh_val"
 
-
-    #obshchaya_ploshchad
+    # obshchaya_ploshchad
     def show_obshchaya_ploshchad(self, instance):
         return instance.obshchaya_ploshchad
 
@@ -296,144 +258,30 @@ class WebsiteAdmin(admin.ModelAdmin):
     show_info.short_description = "Информация"
 
     def show_img(self, instance):
-        bg_color = ""
-        if instance.review_results == "1":
-            bg_color = "background-color: #e6e6e6;"
-        elif instance.review_results == "2":
-            bg_color = "background-color: #00e600;"
-        elif instance.review_results == "3":
-            bg_color = "background-color: #ffb3b3;"
-        images_html_begin = '<div style="display: flex; justify-content: center; align-items: center; border-radius: 5px; {}">'.format(
-            bg_color
-        )
-        images_html = '<img src="/static/flats/{}/main.jpg" width="200" height="200" style="padding: 10px; ">'.format(
-            instance.id
-        )
-        #
-        to_edit = format_html(
-            """<a href="#"
-        onclick="window.open('http://localhost:1337/admin/website/avito/{}/change/',
-                            '_blank',
-                            'width=1100,height=700');
-                return false;"
-    >{}</a>""",
-            instance.id,
-            format_html(images_html),
-        )
-
-        #
-        images_html_end = "</div>"
-        to_edit = images_html_begin + to_edit + images_html_end
-        return format_html(to_edit)
+        return myutils.show_flat_image(instance)
 
     show_img.short_description = "Фото"
 
-    # def show_img(self, instance):
-    #     images_html_begin = '<div style="white-space: nowrap;">'
-    #     images_html = '<img src="/static/flats/{}/main.jpg" width="100" height="100" style="padding-right: 3px;">'.format(instance.id)
-    #     images_html_end = "</div>"
-    #     # for i in range(1, 4):
-    #     #     images_html += '<img src="/static/flats/{}/{}.jpg" width="100" height="100" style="padding-right: 3px;">'.format(
-    #     #         instance.id, i
-    #     #     )
-    #     images_html = images_html_begin + images_html + images_html_end
-    #     return format_html(images_html)
-    # show_img.short_description = "Фото"
+    def action_export_csv(self, request, queryset):
+        return aa.action_export_csv(queryset)
 
-    # add extra data to template
-    def changelist_view(self, request, extra_context=None):
-        # Получаем агрегированные данные (подсчет новых подписчиков по дням)
-        extra_context = extra_context or {}
-        extra_context["chart_data"] = "Hello ^)"
+    action_export_csv.short_description = "Экспорт CSV"
 
-        # Вызываем базовый метод с расширенным контекстом
-        return super().changelist_view(request, extra_context=extra_context)
-
-    def export_to_csv(self, request, queryset):
-        response = HttpResponse(content_type="text/csv")
-        response["Content-Disposition"] = "attachment; filename=avito.csv"
-        writer = csv.writer(response)
-        writer.writerow(
-            [
-                "Адрес",
-                "Заголовок",
-                "ID",
-                "Цена",
-                "Рейтинг инфраструктуры",
-                "Рейтинг дома",
-                "Рейтинг квартиры",
-                "Рейтинг общий",
-            ]
-        )
-
-        for flat in queryset:
-            writer.writerow(
-                [
-                    flat.address,
-                    flat.title,
-                    flat.id,
-                    flat.price,
-                    flat.rating_infrastructure,
-                    flat.rating_house,
-                    flat.rating_flat,
-                    flat.rating_all,
-                ]
-            )
-
-        return response
-
-    export_to_csv.short_description = "Экспорт CSV"
-
+    # Make flat inactive
     def make_inactive(self, request, queryset):
-        for flat in queryset:
-            flat.status = False
-            flat.save()
+        aa.action_make_inactive(queryset)
 
     make_inactive.short_description = "Сделать не активными"
 
+    # Make flat active
     def make_active(self, request, queryset):
-        for flat in queryset:
-            flat.status = True
-            flat.save()
+        aa.action_make_active(queryset)
 
     make_active.short_description = "Сделать активными"
 
-    # def calculate_all_ratings(self, request, queryset):
-    #     for flat in queryset:
-    #         rating_infrastructure = calculate_rating_infrastructure(flat)
-    #         rating_house = calculate_rating_house(flat)
-    #         rating_flat = calculate_rating_flat(flat)
-    #         flat.rating_infrastructure = rating_infrastructure
-    #         flat.rating_house = rating_house
-    #         flat.rating_flat = rating_flat
-    #         flat.rating_all = rating_infrastructure + rating_house + rating_flat
-    #         flat.save()
 
-    # calculate_all_ratings.short_description = "Пересчитать все рейтинги"
-
-    # def rating_infrastructure(self, request, queryset):
-    #     for flat in queryset:
-    #         flat.rating_infrastructure = calculate_rating_infrastructure(flat)
-    #         flat.save()
-
-    # rating_infrastructure.short_description = "Пересчитать рейтинг инфраструктуры"
-
-    # def rating_house(self, request, queryset):
-    #     for flat in queryset:
-    #         flat.rating_house = calculate_rating_house(flat)
-    #         flat.save()
-
-    # rating_house.short_description = "Пересчитать рейтинг дома"
-
-    # def rating_flat(self, request, queryset):
-    #     for flat in queryset:
-    #         flat.rating_flat = calculate_rating_flat(flat)
-    #         flat.save()
-
-    # rating_flat.short_description = "Пересчитать рейтинг квартиры"
-
-    class Media:
-        js = ("js/admin_overrides.js",)
+    # class Media:
+    #     js = ("js/admin_overrides.js",)
 
     def save_model(self, request, obj, form, change):
         years = 5
