@@ -1,3 +1,4 @@
+import datetime
 from django.contrib import admin
 from website.models import Avito
 from django.db import models
@@ -27,8 +28,10 @@ class WebsiteAdmin(admin.ModelAdmin):
         # "etazh_count",
         "kolichestvo_komnat",
         "obshchaya_ploshchad",
-        "god_postroyki",
-        "kapremont_date",
+        # "god_postroyki",
+        "show_god_postroyki",
+        # "kapremont_date",
+        "short_kapremont_date",
         "show_to_kapremont",
         # "rating",
         "show_rating_infrastructure",
@@ -53,7 +56,7 @@ class WebsiteAdmin(admin.ModelAdmin):
     #     "description",
     #     "description_minus",
     # )
-    readonly_fields = ["url", "url_to_img"]
+    readonly_fields = ["is_kapremont", "is_new_lift", "kapremont_diff"]
     actions = [
         "make_inactive",
         "make_active",
@@ -69,33 +72,44 @@ class WebsiteAdmin(admin.ModelAdmin):
         models.FloatField: {"widget": TextInput(attrs={"size": "5"})},
         models.TextField: {"widget": Textarea(attrs={"rows": 5, "cols": 30})},
     }
-    list_filter = ["status", "record_status", "review_results", "district", "source_from"]
+    list_filter = [
+        "status",
+        "record_status",
+        "review_results",
+        "district",
+        "source_from",
+    ]
     search_fields = ["id", "address"]
 
     fieldsets = [
         (
-            "Информация об объявлении",
+            "Дом (рейтинг)",
             {
                 "fields": [
-                    ("url_to_img"),
-                    ("url"),
-                    ("status", "record_status", "review_results"),
-                    ("address", "title"),
-                    ("description", "description_minus"),
+                    (
+                        "is_kapremont",
+                        "is_new_lift",
+                        "is_no_stupenki",
+                        "is_musoroprovod",
+                    ),
+                    (
+                        "god_postroyki",
+                        "kapremont_date",
+                        "kapremont_diff",
+                        "lift_date",
+                    ),
                 ],
             },
         ),
         (
-            "Информация о квартире",
+            "Квартира (рейтинг)",
             {
                 "fields": [
-                    ("district", "price", "kolichestvo_komnat", "obshchaya_ploshchad"),
                     (
-                        "etazh_val",
-                        "etazh_count",
-                        "god_postroyki",
-                        "kapremont_date",
-                        "tip_doma",
+                        "is_kuxnya",
+                        "is_tualet",
+                        "is_vana",
+                        "is_balkon",
                     ),
                 ],
             },
@@ -120,27 +134,27 @@ class WebsiteAdmin(admin.ModelAdmin):
             },
         ),
         (
-            "Дом (рейтинг)",
+            "Дополения и замечания в свободной форме",
             {
                 "fields": [
-                    (
-                        "is_kapremont",
-                        "is_no_stupenki",
-                        "is_musoroprovod",
-                        "is_new_lift",
-                    ),
+                    ("description", "description_minus"),
                 ],
             },
         ),
         (
-            "Квартира (рейтинг)",
+            "Информация о квартире",
             {
                 "fields": [
                     (
-                        "is_kuxnya",
-                        "is_tualet",
-                        "is_vana",
-                        "is_balkon",
+                        "district",
+                        "tip_doma",
+                        "price",
+                        "kolichestvo_komnat",
+                        "obshchaya_ploshchad",
+                        "etazh_val",
+                        "etazh_count",
+                        # "god_postroyki",
+                        # "kapremont_date",
                     ),
                 ],
             },
@@ -170,6 +184,12 @@ class WebsiteAdmin(admin.ModelAdmin):
 
     # delete_model.short_description = 'Удалить выбранные записи'
 
+    def show_god_postroyki(self, instance):
+        return instance.god_postroyki
+
+    show_god_postroyki.short_description = "Год"
+    show_god_postroyki.admin_order_field = "god_postroyki"
+
     def show_rating_infrastructure(self, instance):
         return instance.rating_infrastructure
 
@@ -198,9 +218,10 @@ class WebsiteAdmin(admin.ModelAdmin):
         return format_html(instance.url)
 
     def show_to_kapremont(self, instance):
-        return instance.to_kapremont
+        return instance.kapremont_diff
 
     show_to_kapremont.short_description = "КЛет"
+    show_to_kapremont.admin_order_field = "kapremont_diff"
 
     def show_kolichestvo_komnat(self, instance):
         return instance.kolichestvo_komnat
@@ -331,6 +352,16 @@ class WebsiteAdmin(admin.ModelAdmin):
     class Media:
         js = ("js/admin_overrides.js",)
 
+    def save_model(self, request, obj, form, change):
+        if "kapremont_date" in request.POST and request.POST["kapremont_date"]:
+            ddiff = int(request.POST["kapremont_date"]) - int(datetime.date.today().strftime("%Y"))
+            obj.kapremont_diff = ddiff
+            if ddiff >= 5:
+                obj.is_kapremont = True
+            else:
+                obj.is_kapremont = False
+
+        super().save_model(request, obj, form, change)
 
 admin.site.register(Avito, WebsiteAdmin)
 # Register your models here.

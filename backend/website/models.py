@@ -152,10 +152,16 @@ class Avito(models.Model):
         max_length=50, choices=TIP_DOMA_CHOICES, default="", verbose_name="Тип дома"
     )
     god_postroyki = models.CharField(
-        blank=True, null=True, max_length=20, verbose_name="Год"
+        blank=True, null=True, max_length=20, verbose_name="Год постройки"
     )
     kapremont_date = models.CharField(
-        blank=True, null=True, max_length=20, verbose_name="Капремонт"
+        blank=True, null=True, max_length=20, verbose_name="Дата капремонт"
+    )
+    kapremont_diff = models.CharField(
+        blank=True, null=True, max_length=20, verbose_name="Лет до капремонта"
+    )
+    lift_date = models.CharField(
+        blank=True, null=True, max_length=20, verbose_name="Дата замены лифта"
     )
     etazhey_v_dome = models.TextField(blank=True, null=True)
     passazhirskiy_lift = models.TextField(blank=True, null=True)
@@ -242,6 +248,7 @@ class Avito(models.Model):
     def to_kapremont(self):
         if self.kapremont_date:
             return int(self.kapremont_date) - int(datetime.date.today().strftime("%Y"))
+        # self.save()
         return None
 
     @property

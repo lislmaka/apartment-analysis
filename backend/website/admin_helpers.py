@@ -2,6 +2,7 @@ from django.utils.html import format_html
 
 
 def show_info33(instance):
+    record_status = show_record_status(instance)
     infrastructure_info = show_infrastructure_info(instance)
     house_info = show_house_info(instance)
     flat_info = show_house_flat(instance)
@@ -10,8 +11,9 @@ def show_info33(instance):
     lmaps = maps(instance)
 
     # display: inline-block; background-color: #f2f2f2;
-    to_obj = """<div style="">{} {} {} {} {} {}</div>""".format(
+    to_obj = """<div style="">{} {} {} {} {} {} {}</div>""".format(
         lmaps,
+        record_status,
         general_info,
         infrastructure_info,
         house_info,
@@ -320,16 +322,33 @@ def show_infrastructure_info(instance):
     return format_html(to_obj_html)
 
 
+def show_record_status(instance):
+    status = show_item(
+        "#e6e6e6", instance.get_record_status_display(), f"[{instance.record_status}]"
+    )
+    bg_color  = "#e6e6e6"
+    if instance.review_results == "2":
+        bg_color  = "#00e600"
+    elif instance.review_results == "3":
+        bg_color  = "#ffb3b3"
+
+    review_results = show_item(bg_color, instance.get_review_results_display(), "")
+    return format_html("{} {}", format_html(status), format_html(review_results))
+
+
 def show_general_info(instance):
     # show_item("#e6e6e6", instance.tip_doma.capitalize(), "")
     dop_info = []
 
+    # dop_info.append(instance.get_record_status_display())
     # if instance.review_results == 1:
     #     dop_info.append(show_item("#e6e6e6", instance.get_review_results_display(), ""))
     # elif instance.review_results == 2:
     #     dop_info.append(show_item("#00e600", instance.get_review_results_display(), ""))
     # else:
     #     dop_info.append(show_item("#ffb3b3", instance.get_review_results_display(), ""))
+    dop_info.append(show_item("#e6e6e6", instance.id, ""))
+
     address = instance.address.split(",")
     dop_info.append(
         show_item("#e6e6e6", f"{address[-3]}, {address[-2]}, {address[-1]}", "")
@@ -562,15 +581,14 @@ def maps(instance):
         instance.source_from.capitalize(),
     )
 
-    to_andreevka = format_html(
+    to_2gis = format_html(
         """<a href="#"
-    onclick="window.open('https://yandex.ru/maps/?rtext={}~{}&rtt=mt',
+    onclick="window.open('https://2gis.ru/bryansk/search/{}',
                          '_blank',
                          'width=1100,height=700');
               return false;"
- >Андреевка</a>""",
+ >2GIS</a>""",
         instance.address,
-        "Центральная улица, 57, деревня Антоновка, Супоневское сельское поселение, Брянский район",
     )
 
     to_edit = format_html(
@@ -588,7 +606,7 @@ def maps(instance):
         format_html(show_item("#e6e6e6", to_hospital, "")),
         format_html(show_item("#e6e6e6", to_vokzal, "")),
         format_html(show_item("#e6e6e6", to_avito, "")),
-        format_html(show_item("#e6e6e6", to_andreevka, "")),
+        format_html(show_item("#e6e6e6", to_2gis, "")),
         format_html(show_item("#e6e6e6", to_address_on_map, "")),
         format_html(show_item("#e6e6e6", to_address_on_map_google, "")),
         format_html(show_item("#e6e6e6", to_edit, "")),
