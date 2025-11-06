@@ -50,6 +50,20 @@ class Avito(models.Model):
         ("3", "Осмотр был. Квартира не подходит"),     
     ]
 
+    RESEARCH_RESULTS_CHOICES = [
+        ("1", "Пока не искали"),
+        ("2", "Хорошо"),
+        ("3", "Плохо"),
+        ("4", "Информация не найдена"),  
+    ]
+
+    YESNO_RESULTS_CHOICES = [
+        ("1", "Пока не искали"),
+        ("2", "Да"),
+        ("3", "Нет"),
+        ("4", "Информация не найдена"),  
+    ]
+
     # id = models.BigAutoField(primary_key=True)
     # id = models.CharField(blank=True, null=True, verbose_name="ID объявления")
     id = models.BigAutoField(
@@ -87,8 +101,8 @@ class Avito(models.Model):
     )
 
     record_status = models.CharField(
-        blank=True,
-        null=True,
+        # blank=True,
+        # null=True,
         max_length=50,
         choices=RECORD_STATUS_CHOICES,
         default=1,
@@ -96,11 +110,11 @@ class Avito(models.Model):
     )
 
     review_results = models.CharField(
-        blank=True,
-        null=True,
+        # blank=True,
+        # null=True,
         max_length=50,
         choices=REVIEW_RESULTS_CHOICES,
-        default="",
+        default=1,
         verbose_name="Осмотр",
     )
 
@@ -155,7 +169,7 @@ class Avito(models.Model):
         blank=True, null=True, max_length=20, verbose_name="Год постройки"
     )
     kapremont_date = models.CharField(
-        blank=True, null=True, max_length=20, verbose_name="Дата капремонт"
+        blank=True, null=True, max_length=20, verbose_name="Дата капремонта"
     )
     kapremont_diff = models.CharField(
         blank=True, null=True, max_length=20, verbose_name="Кол-во лет до капремонта"
@@ -165,6 +179,9 @@ class Avito(models.Model):
     )
     lift_date = models.CharField(
         blank=True, null=True, max_length=20, verbose_name="Дата замены лифта"
+    )
+    gkx_payments = models.CharField(
+        blank=True, null=True, max_length=20, verbose_name="Стоимость комунальных платежей"
     )
     etazhey_v_dome = models.TextField(blank=True, null=True)
     passazhirskiy_lift = models.TextField(blank=True, null=True)
@@ -207,6 +224,9 @@ class Avito(models.Model):
     to_yandex = models.CharField(
         blank=True, null=True, max_length=20, verbose_name="Yandex"
     )
+    to_bus_stop = models.CharField(
+        blank=True, null=True, max_length=20, verbose_name="Остановка"
+    )
     # status = models.CharField(
     #     blank=True, null=True, max_length=100, verbose_name="Статус"
     # )
@@ -219,16 +239,16 @@ class Avito(models.Model):
     dopolnitelno = models.TextField(blank=True, null=True)
     teplyy_pol = models.TextField(blank=True, null=True)
     zaplanirovan_snos = models.TextField(blank=True, null=True)
-    rating_infrastructure = models.IntegerField(
+    rating_infrastructure = models.FloatField(
         default=0, verbose_name="Рейтинг инфраструктуры"
     )
-    rating_house = models.IntegerField(
+    rating_house = models.FloatField(
         default=0, verbose_name="Рейтинг дома"
     )
-    rating_flat = models.IntegerField(
+    rating_flat = models.FloatField(
         default=0, verbose_name="Рейтинг квартиры"
     )
-    rating_all = models.IntegerField(
+    rating_all = models.FloatField(
         default=0, verbose_name="Суммарный рейтинг"
     )
     is_kapremont = models.BooleanField(default=False, verbose_name="Есть время до капремонта")
@@ -239,6 +259,40 @@ class Avito(models.Model):
     is_tualet = models.BooleanField(default=False, verbose_name="Нормальный туалет")
     is_vana = models.BooleanField(default=False, verbose_name="Нормальная ванная")
     is_balkon = models.BooleanField(default=False, verbose_name="Нормальный балкон")
+    is_neighbors_around = models.BooleanField(default=False, verbose_name="Нормальные соседи рядом")
+    is_neighbors_top = models.BooleanField(default=False, verbose_name="Нормальные соседи сверху")
+    is_door = models.BooleanField(default=False, verbose_name="Нормальная входня дверь")
+    kuxnya = models.CharField(
+        max_length=50, choices=RESEARCH_RESULTS_CHOICES, default="1", verbose_name="Кухня"
+    )
+    tualet = models.CharField(
+        max_length=50, choices=RESEARCH_RESULTS_CHOICES, default="1", verbose_name="Туалет"
+    )
+    vana = models.CharField(
+        max_length=50, choices=RESEARCH_RESULTS_CHOICES, default="1", verbose_name="Ванная комната"
+    )
+    balkon = models.CharField(
+        max_length=50, choices=RESEARCH_RESULTS_CHOICES, default="1", verbose_name="Балкон"
+    )
+
+    door = models.CharField(
+        max_length=50, choices=RESEARCH_RESULTS_CHOICES, default="1", verbose_name="Входная дверь"
+    )
+    neighbors_around = models.CharField(
+        max_length=50, choices=RESEARCH_RESULTS_CHOICES, default="1", verbose_name="Соседи рядом"
+    )
+    neighbors_top = models.CharField(
+        max_length=50, choices=RESEARCH_RESULTS_CHOICES, default="1", verbose_name="Соседи сверху"
+    )
+    tambur = models.CharField(
+        max_length=50, choices=YESNO_RESULTS_CHOICES, default="1", verbose_name="Наличие тамбура"
+    )
+    no_stupenki = models.CharField(
+        max_length=50, choices=YESNO_RESULTS_CHOICES, default="1", verbose_name="Наличие ступенек при входе в подьезд"
+    )
+    musoroprovod = models.CharField(
+        max_length=50, choices=YESNO_RESULTS_CHOICES, default="1", verbose_name="Наличие мусоропровода в доме"
+    )
 
     class Meta:
         managed = False

@@ -136,16 +136,34 @@ def show_house_flat(instance):
             "instance": instance.is_balkon,
             "rez": None,
         },
+        "is_neighbors_around": {
+            "title": "Соседи рядом",
+            "instance": instance.is_neighbors_around,
+            "rez": None,
+        },
+        "is_neighbors_top": {
+            "title": "Соседи сверху",
+            "instance": instance.is_neighbors_top,
+            "rez": None,
+        },
+        "is_door": {
+            "title": "Дверь",
+            "instance": instance.is_door,
+            "rez": None,
+        },
     }
     for item in d:
         d[item]["rez"] = calc_item_flat(d[item]["instance"], d[item]["title"])
 
-    to_obj = """<div style="">{} {} {} {} {}</div>""".format(
+    to_obj = """<div style="">{} {} {} {} {} {} {} {}</div>""".format(
         show_item("#cccccc", "Квартира", ""),
         d["is_kuxnya"]["rez"],
         d["is_tualet"]["rez"],
         d["is_vana"]["rez"],
         d["is_balkon"]["rez"],
+        d["is_neighbors_around"]["rez"],
+        d["is_neighbors_top"]["rez"],
+        d["is_door"]["rez"],
     )
     to_obj_html = format_html(to_obj)
 
@@ -202,7 +220,8 @@ def show_infrastructure_info(instance):
         # "Магазин",
         "Пятерочка",
         "Магнит",
-        "Аптека",
+        # "Аптека",
+        "Остановка",
         "Ozon",
         "WB",
         "YM",
@@ -230,6 +249,11 @@ def show_infrastructure_info(instance):
         "to_magnit": {
             "title": "Магнит",
             "instance": instance.to_magnit,
+            "rez": None,
+        },
+        "to_bus_stop": {
+            "title": "Остановка",
+            "instance": instance.to_bus_stop,
             "rez": None,
         },
         "to_bolnitsa": {
@@ -263,7 +287,7 @@ def show_infrastructure_info(instance):
             "rez": None,
         },
         "to_yandex": {
-            "title": "YD",
+            "title": "YM",
             "instance": instance.to_yandex,
             "rez": None,
         },
@@ -316,18 +340,19 @@ def show_infrastructure_info(instance):
     to_obj_main = """<div style="">{} {} {} {}</div>""".format(
         show_item("#cccccc", "Инфраструктура", ""),
         mags_item,
-        d["to_apteka"]["rez"],
+        d["to_bus_stop"]["rez"],
         deliverys_item,
         # d["to_magazin"]["rez"],
         # d["to_bolnitsa"]["rez"],
         # d["to_pochta"]["rez"],
         # d["to_bank"]["rez"],
     )
-    to_obj_seccond = """<div style="">{} {} {} {}</div>""".format(
+    to_obj_seccond = """<div style="">{} {} {} {} {}</div>""".format(
         d["to_magazin"]["rez"],
         d["to_bolnitsa"]["rez"],
         d["to_pochta"]["rez"],
         d["to_bank"]["rez"],
+        d["to_apteka"]["rez"],
     )
     to_obj_html = format_html(
         "{} {}", format_html(to_obj_main), format_html(to_obj_seccond)
