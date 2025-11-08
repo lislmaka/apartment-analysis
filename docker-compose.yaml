@@ -1,6 +1,7 @@
 volumes:
   db-data:
   static_volume:
+  media_volume:
 
 networks:
   internal-net:
@@ -19,6 +20,7 @@ services:
       - service.frontend
     volumes:
       - static_volume:/usr/share/nginx/html/static
+      - media_volume:/usr/share/nginx/html/public
     restart: unless-stopped
     networks:
       - internal-net
@@ -58,6 +60,7 @@ services:
     volumes:
       - ./backend:/app
       - static_volume:/app/static
+      - media_volume:/app/public
     env_file:
       - ./settings/env/.env.backend
     depends_on:

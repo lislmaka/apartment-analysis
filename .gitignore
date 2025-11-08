@@ -1,3 +1,6 @@
 parser/
 readmeforme.md
 frontend/public/flats
+backend/public
+backend/static
+backend/website/static
