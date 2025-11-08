@@ -9,13 +9,16 @@ from django.db import models
 import datetime
 from django.utils.html import format_html
 
+
 def image_path(instance, filename):
     # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
     return "images/{}/main.jpg".format(instance.id)
 
+
 def video_path(instance, filename):
     # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
     return "video/{}/main.mp4".format(instance.id)
+
 
 class Avito(models.Model):
     DISTRICT_CHOICES = [
@@ -45,30 +48,30 @@ class Avito(models.Model):
     RECORD_STATUS_CHOICES = [
         ("1", "Новая"),
         ("2", "Капремонт"),
-        ("3", "Дом"),     
-        ("4", "Квартира"),  
-        ("5", "Инфраструктура"), 
-        ("6", "Все данные внесены"), 
+        ("3", "Дом"),
+        ("4", "Квартира"),
+        ("5", "Инфраструктура"),
+        ("6", "Все данные внесены"),
     ]
-    
+
     REVIEW_RESULTS_CHOICES = [
         ("1", "Осмотра не было"),
         ("2", "Осмотр был. Квартира подходит"),
-        ("3", "Осмотр был. Квартира не подходит"),     
+        ("3", "Осмотр был. Квартира не подходит"),
     ]
 
     RESEARCH_RESULTS_CHOICES = [
         ("1", "Пока не искали"),
         ("2", "Хорошо"),
         ("3", "Плохо"),
-        ("4", "Информация не найдена"),  
+        ("4", "Информация не найдена"),
     ]
 
     YESNO_RESULTS_CHOICES = [
         ("1", "Пока не искали"),
         ("2", "Да"),
         ("3", "Нет"),
-        ("4", "Информация не найдена"),  
+        ("4", "Информация не найдена"),
     ]
 
     # id = models.BigAutoField(primary_key=True)
@@ -188,7 +191,10 @@ class Avito(models.Model):
         blank=True, null=True, max_length=20, verbose_name="Дата замены лифта"
     )
     gkx_payments = models.CharField(
-        blank=True, null=True, max_length=20, verbose_name="Стоимость комунальных платежей"
+        blank=True,
+        null=True,
+        max_length=20,
+        verbose_name="Стоимость комунальных платежей",
     )
     etazhey_v_dome = models.TextField(blank=True, null=True)
     passazhirskiy_lift = models.TextField(blank=True, null=True)
@@ -249,60 +255,98 @@ class Avito(models.Model):
     rating_infrastructure = models.FloatField(
         default=0, verbose_name="Рейтинг инфраструктуры"
     )
-    rating_house = models.FloatField(
-        default=0, verbose_name="Рейтинг дома"
+    rating_house = models.FloatField(default=0, verbose_name="Рейтинг дома")
+    rating_flat = models.FloatField(default=0, verbose_name="Рейтинг квартиры")
+    rating_all = models.FloatField(default=0, verbose_name="Суммарный рейтинг")
+    is_kapremont = models.BooleanField(
+        default=False, verbose_name="Есть время до капремонта"
     )
-    rating_flat = models.FloatField(
-        default=0, verbose_name="Рейтинг квартиры"
+    is_no_stupenki = models.BooleanField(
+        default=False, verbose_name="Нет ступенек перед входом в подьезд"
     )
-    rating_all = models.FloatField(
-        default=0, verbose_name="Суммарный рейтинг"
+    is_musoroprovod = models.BooleanField(
+        default=False, verbose_name="Есть мусоропровод"
     )
-    is_kapremont = models.BooleanField(default=False, verbose_name="Есть время до капремонта")
-    is_no_stupenki = models.BooleanField(default=False, verbose_name="Нет ступенек перед входом в подьезд")
-    is_musoroprovod = models.BooleanField(default=False, verbose_name="Есть мусоропровод")
     is_new_lift = models.BooleanField(default=False, verbose_name="Новый лифт")
     is_kuxnya = models.BooleanField(default=False, verbose_name="Нормальная кухня")
     is_tualet = models.BooleanField(default=False, verbose_name="Нормальный туалет")
     is_vana = models.BooleanField(default=False, verbose_name="Нормальная ванная")
     is_balkon = models.BooleanField(default=False, verbose_name="Нормальный балкон")
-    is_neighbors_around = models.BooleanField(default=False, verbose_name="Нормальные соседи рядом")
-    is_neighbors_top = models.BooleanField(default=False, verbose_name="Нормальные соседи сверху")
+    is_neighbors_around = models.BooleanField(
+        default=False, verbose_name="Нормальные соседи рядом"
+    )
+    is_neighbors_top = models.BooleanField(
+        default=False, verbose_name="Нормальные соседи сверху"
+    )
     is_door = models.BooleanField(default=False, verbose_name="Нормальная входня дверь")
     kuxnya = models.CharField(
-        max_length=50, choices=RESEARCH_RESULTS_CHOICES, default="1", verbose_name="Кухня"
+        max_length=50,
+        choices=RESEARCH_RESULTS_CHOICES,
+        default="1",
+        verbose_name="Кухня",
     )
     tualet = models.CharField(
-        max_length=50, choices=RESEARCH_RESULTS_CHOICES, default="1", verbose_name="Туалет"
+        max_length=50,
+        choices=RESEARCH_RESULTS_CHOICES,
+        default="1",
+        verbose_name="Туалет",
     )
     vana = models.CharField(
-        max_length=50, choices=RESEARCH_RESULTS_CHOICES, default="1", verbose_name="Ванная комната"
+        max_length=50,
+        choices=RESEARCH_RESULTS_CHOICES,
+        default="1",
+        verbose_name="Ванная комната",
     )
     balkon = models.CharField(
-        max_length=50, choices=RESEARCH_RESULTS_CHOICES, default="1", verbose_name="Балкон"
+        max_length=50,
+        choices=RESEARCH_RESULTS_CHOICES,
+        default="1",
+        verbose_name="Балкон",
     )
 
     door = models.CharField(
-        max_length=50, choices=RESEARCH_RESULTS_CHOICES, default="1", verbose_name="Входная дверь"
+        max_length=50,
+        choices=RESEARCH_RESULTS_CHOICES,
+        default="1",
+        verbose_name="Входная дверь",
     )
     neighbors_around = models.CharField(
-        max_length=50, choices=RESEARCH_RESULTS_CHOICES, default="1", verbose_name="Соседи рядом"
+        max_length=50,
+        choices=RESEARCH_RESULTS_CHOICES,
+        default="1",
+        verbose_name="Соседи рядом",
     )
     neighbors_top = models.CharField(
-        max_length=50, choices=RESEARCH_RESULTS_CHOICES, default="1", verbose_name="Соседи сверху"
+        max_length=50,
+        choices=RESEARCH_RESULTS_CHOICES,
+        default="1",
+        verbose_name="Соседи сверху",
     )
     tambur = models.CharField(
-        max_length=50, choices=YESNO_RESULTS_CHOICES, default="1", verbose_name="Наличие тамбура"
+        max_length=50,
+        choices=YESNO_RESULTS_CHOICES,
+        default="1",
+        verbose_name="Наличие тамбура",
     )
     no_stupenki = models.CharField(
-        max_length=50, choices=YESNO_RESULTS_CHOICES, default="1", verbose_name="Наличие ступенек при входе в подьезд"
+        max_length=50,
+        choices=YESNO_RESULTS_CHOICES,
+        default="1",
+        verbose_name="Наличие ступенек при входе в подьезд",
     )
     musoroprovod = models.CharField(
-        max_length=50, choices=YESNO_RESULTS_CHOICES, default="1", verbose_name="Наличие мусоропровода в доме"
+        max_length=50,
+        choices=YESNO_RESULTS_CHOICES,
+        default="1",
+        verbose_name="Наличие мусоропровода в доме",
     )
 
-    file_img = models.FileField(upload_to=image_path, null=True, blank=True, verbose_name="Фото")
-    file_video = models.FileField(upload_to=video_path, null=True, blank=True, verbose_name="Видео")
+    file_img = models.FileField(
+        upload_to=image_path, null=True, blank=True, verbose_name="Фото"
+    )
+    file_video = models.FileField(
+        upload_to=video_path, null=True, blank=True, verbose_name="Видео"
+    )
 
     class Meta:
         managed = False
