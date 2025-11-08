@@ -42,6 +42,31 @@ def action_export_csv(queryset):
 
     return response
 
+def action_export_info(queryset):
+    """Action export to csv"""
+    response = HttpResponse(content_type="text/csv")
+    response["Content-Disposition"] = "attachment; filename=avito_info.csv"
+    writer = csv.writer(response)
+    # writer.writerow(
+    #     [
+    #         "Адрес",
+    #         "Заголовок",
+    #         "Цена",
+    #         "URL"
+    #     ]
+    # )
+
+    for flat in queryset:
+        writer.writerow(
+            [
+                # flat.address,
+                # flat.title,
+                # flat.price,
+                flat.url,
+            ]
+        )
+
+    return response
 
 def action_make_active(queryset):
     """Make flat active"""

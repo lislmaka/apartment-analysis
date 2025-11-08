@@ -97,13 +97,13 @@
 <div style="text-align: center; padding: 20px;">
     {% if link_type == "1" %}
         <a href="http://localhost:1337/admin/website/avito/?link_type=1" class="href">
-            <button style="text-align: center; padding: 5px 20px; background-color: #00e600;">
+            <button style="cursor: pointer; text-align: center; padding: 5px 5px; background-color: #00e600;">
                 Базовый вид
             </button>
         </a>
     {% else %}
         <a href="http://localhost:1337/admin/website/avito/?link_type=1" class="href">
-            <button style="text-align: center; padding: 5px 20px; ">
+            <button style="cursor: pointer; text-align: center; padding: 5px 5px; ">
                 Базовый вид
             </button>
         </a>
@@ -112,18 +112,30 @@
 
     {% if link_type == "2" %}
     <a href="http://localhost:1337/admin/website/avito/?o=-3.2&status__exact=1&link_type=2" class="href">
-        <button style="text-align: center; padding: 5px 20px; background-color: #00e600;">
+        <button style="cursor: pointer; text-align: center; padding: 5px 5px; background-color: #00e600;">
             Сотрировка по цене и рейтингу
         </button>
     </a>
     {% else %}
     <a href="http://localhost:1337/admin/website/avito/?o=-3.2&status__exact=1&link_type=2" class="href">
-        <button style="text-align: center; padding: 5px 20px;">
+        <button style="cursor: pointer; text-align: center; padding: 5px 5px;">
             Сотрировка по цене и рейтингу
         </button>
     </a>
     {% endif %}
+<!-- Google Map Begin -->
+    <a href="#"
+        onclick="window.open('https://www.google.com/maps/d/edit?mid=1CqEeIWmaLPMRzZq0li8Mv9vylvzM9YY&usp=sharing',
+                            '_blank',
+                            'width=1100,height=700');
+                return false;"
+    >
+            <button style="text-align: center; padding: 5px 5px; cursor: pointer;">
+                Google Map
+            </button>
 
+        </a>
+<!-- Google Map End -->
 <!-- Last Begin -->
  {% for obj in history %}
     <!-- <a href="http://localhost:1337/admin/website/avito/{{obj.object_id}}/change/">{{obj.object_id}}</a> -->

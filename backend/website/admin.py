@@ -36,6 +36,8 @@ class LinkTypeFilter(admin.SimpleListFilter):
 class WebsiteAdmin(admin.ModelAdmin):
     # class Media:
     #     js = ("js/admin_overrides.js",)
+    class Media:
+        js = ("js/copy.js",)
 
     show_facets = admin.ShowFacets.ALWAYS
     list_display = [
@@ -76,9 +78,11 @@ class WebsiteAdmin(admin.ModelAdmin):
         "rating_house",
         "rating_flat",
         "rating_all",
+        "url",
     ]
     actions = [
         "action_export_csv",
+        "action_export_info",
         "make_inactive",
         "make_active",
         "recalc_all_ratings",
@@ -106,6 +110,7 @@ class WebsiteAdmin(admin.ModelAdmin):
             {
                 "fields": [
                     ("address",),
+                    ("url",),
                     (
                         "rating_infrastructure",
                         "rating_house",
@@ -369,7 +374,12 @@ class WebsiteAdmin(admin.ModelAdmin):
     def action_export_csv(self, request, queryset):
         return aa.action_export_csv(queryset)
 
-    action_export_csv.short_description = "Экспорт CSV"
+    action_export_csv.short_description = "Экспорт CSV Google   "
+
+    def action_export_info(self, request, queryset):
+        return aa.action_export_info(queryset)
+
+    action_export_info.short_description = "Экспорт CSV INFO   "
 
     # Make flat inactive
     def make_inactive(self, request, queryset):
@@ -486,4 +496,5 @@ class WebsiteAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Avito, WebsiteAdmin)
+admin.site.site_header = "Анализ квартир"
 # Register your models here.

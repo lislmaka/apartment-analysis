@@ -24,7 +24,7 @@ def show_info33(instance):
     return to_obj_html
 
 
-def show_item(background_color, title, value):
+def show_item(background_color, title, value, is_copy=False):
     rez = """<span style="
     display: inline-block; 
     background-color: {}; 
@@ -33,6 +33,15 @@ def show_item(background_color, title, value):
     margin: 3px;">
     {} {}
     </span>""".format(background_color, title, value)
+    if is_copy:
+        rez = """<span style="
+        display: inline-block; 
+        background-color: {}; 
+        color: black; 
+        padding: 3px; 
+        margin: 3px; cursor:pointer;" onclick="copyToClipboard('{}')">
+        {} {}
+        </span>""".format(background_color, title, title, value)
 
     return rez
 
@@ -379,18 +388,18 @@ def show_record_status(instance):
 
 def show_general_info(instance):
     dop_info = []
-    dop_info.append(show_item("#e6e6e6", instance.id, ""))
+    dop_info.append(show_item("#e6e6e6", instance.id, "", True))
 
     address = instance.address.split(",")
     if instance.source_from == "avito":
         dop_info.append(
             # show_item("#e6e6e6", f"{address[-3]}, {address[-2]}, {address[-1]}", "")
-            show_item("#e6e6e6", f"{address[-2]}, {address[-1]}", "")
+            show_item("#e6e6e6", f"{address[-2]}, {address[-1]}", "", True)
         )
     if instance.source_from == "cian":
         dop_info.append(
             # show_item("#e6e6e6", f"{address[2]}, {address[0]}, {address[1]}", "")
-            show_item("#e6e6e6", f"{address[0]}, {address[1]}", "")
+            show_item("#e6e6e6", f"{address[0]}, {address[1]}", "", True)
         )
 
     if instance.district:
@@ -618,14 +627,14 @@ def maps(instance):
         instance.address,
     )
 
-    to_address_on_map_google_all = format_html(
-        """<a href="#"
-    onclick="window.open('https://www.google.com/maps/d/edit?mid=1CqEeIWmaLPMRzZq0li8Mv9vylvzM9YY&usp=sharing',
-                         '_blank',
-                         'width=1100,height=700');
-              return false;"
- >GoogleAll</a>"""
-    )
+#     to_address_on_map_google_all = format_html(
+#         """<a href="#"
+#     onclick="window.open('https://www.google.com/maps/d/edit?mid=1CqEeIWmaLPMRzZq0li8Mv9vylvzM9YY&usp=sharing',
+#                          '_blank',
+#                          'width=1100,height=700');
+#               return false;"
+#  >GoogleAll</a>"""
+#     )
 
     to_avito = format_html(
         """<a href="#"
@@ -659,14 +668,14 @@ def maps(instance):
     #     )
 
     return format_html(
-        """<div>{} {} {} {} {} {} {}</div>""",
+        """<div>{} {} {} {} {} {}</div>""",
         format_html(show_item("#e6e6e6", to_hospital, "")),
         format_html(show_item("#e6e6e6", to_vokzal, "")),
         format_html(show_item("#e6e6e6", to_avito, "")),
         format_html(show_item("#e6e6e6", to_2gis, "")),
         format_html(show_item("#e6e6e6", to_address_on_map, "")),
         format_html(show_item("#e6e6e6", to_address_on_map_google, "")),
-        format_html(show_item("#e6e6e6", to_address_on_map_google_all, "")),
+        # format_html(show_item("#e6e6e6", to_address_on_map_google_all, "")),
     )
 
 
