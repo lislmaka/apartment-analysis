@@ -10,7 +10,7 @@ def show_info33(instance):
     general_info = show_general_info(instance)
     lmaps = maps(instance)
 
-    # display: inline-block; background-color: #f2f2f2;
+    # display: inline-block; background-color: #f2f2f2; font-size: 12px;
     to_obj = """<div style="">{} {} {} {} {} {} {}</div>""".format(
         lmaps,
         record_status,
@@ -137,12 +137,12 @@ def show_house_flat(instance):
             "rez": None,
         },
         "is_neighbors_around": {
-            "title": "Соседи рядом",
+            "title": "Соседи &#8660;",
             "instance": instance.is_neighbors_around,
             "rez": None,
         },
         "is_neighbors_top": {
-            "title": "Соседи сверху",
+            "title": "Соседи &#8657;",
             "instance": instance.is_neighbors_top,
             "rez": None,
         },
@@ -398,6 +398,14 @@ def show_general_info(instance):
     if instance.tip_doma:
         dop_info.append(show_item("#e6e6e6", instance.tip_doma.capitalize(), ""))
 
+    if instance.etazh_val:
+        dop_info.append(show_item("#e6e6e6", "Этаж", instance.etazh_val))
+    if instance.etazh_count:
+        dop_info.append(show_item("#e6e6e6", "Этажей", instance.etazh_count))
+    if instance.obshchaya_ploshchad:
+        dop_info.append(show_item("#e6e6e6", "Площадь", instance.obshchaya_ploshchad))
+    if instance.god_postroyki:
+        dop_info.append(show_item("#e6e6e6", "Год постройки", instance.god_postroyki))
     return format_html("<div>{}</div>", format_html("".join(map(str, dop_info))))
 
 
@@ -673,7 +681,7 @@ def show_flat_image(instance):
         images_html_begin = '<div style="display: flex; justify-content: center; align-items: center; border-radius: 5px; {}">'.format(
             bg_color
         )
-        images_html = '<img src="/static/flats/{}/main.jpg" width="200" height="200" style="padding: 10px; ">'.format(
+        images_html = '<img src="/static/flats/{}/main.jpg" width="150" height="150" style="padding-bottom: 10px; ">'.format(
             instance.id
         )
         #
@@ -687,8 +695,19 @@ def show_flat_image(instance):
             instance.id,
             format_html(images_html),
         )
-
+    #     video = format_html(
+    #       """<div><a href="#"
+    #     onclick="window.open('http://localhost:1337/static/video/video.html',
+    #                         '_blank',
+    #                         'width=500,height=300');
+    #             return false;"
+    # >{}</a></div>""",
+    #         "Видео",
+    #     )
+        video = ""
+        if instance.file_video:
+            video = format_html("""<a href="http://localhost:1337/public/{}" target="_blank"">Видео отчет</>""", instance.file_video)
         #
         images_html_end = "</div>"
-        to_edit = images_html_begin + to_edit + images_html_end
+        to_edit = images_html_begin + to_edit + images_html_end + video
         return format_html(to_edit)    

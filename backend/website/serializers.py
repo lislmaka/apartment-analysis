@@ -7,14 +7,16 @@ class WebsiteSerializer(serializers.ModelSerializer):
         model = Avito
         fields = [
             "id",
-            "title",
-            "url",
-            "address",
+            "rating_all",
             "price",
-            "kolichestvo_komnat",
-            "obshchaya_ploshchad",
-            "god_postroyki",
-            "kapremont_date",
-            "etazh_val",
-            "etazh_count"
+            # "title",
+            # "url",
+            # "address",
+            # "price",
+            # "kolichestvo_komnat",
+            # "obshchaya_ploshchad",
+            # "god_postroyki",
+            # "kapremont_date",
+            # "etazh_val",
+            # "etazh_count"
         ]

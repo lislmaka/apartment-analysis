@@ -1,7 +1,9 @@
 import csv
 import datetime
+import json
 from django.contrib import admin
 from django.http import HttpResponse
+from website.serializers import WebsiteSerializer
 from website.models import Avito
 from django.db import models
 from django.forms import TextInput, Textarea
@@ -14,19 +16,35 @@ from website.admin_ratings import (
     calculate_rating_flat,
     calculate_rating_house,
 )
+from django.contrib.admin.models import LogEntry
+from django.db.models import Count
+from django.contrib.admin import DateFieldListFilter
+
+
+class LinkTypeFilter(admin.SimpleListFilter):
+    title = ""
+    parameter_name = "link_type"
+    template = "admin/hidden_filter.html"
+
+    def lookups(self, request, model_admin):
+        return ((request.GET.get(self.parameter_name), ""),)
+
+    def queryset(self, request, queryset):
+        return queryset
 
 
 class WebsiteAdmin(admin.ModelAdmin):
-    class Media:
-        js = ("js/admin_overrides.js",)
+    # class Media:
+    #     js = ("js/admin_overrides.js",)
 
+    show_facets = admin.ShowFacets.ALWAYS
     list_display = [
         "show_info",
         "price",
-        "show_etazh_val",
-        "show_kolichestvo_komnat",
-        "show_obshchaya_ploshchad",
-        "show_god_postroyki",
+        # "show_etazh_val",
+        # "show_kolichestvo_komnat",
+        # "show_obshchaya_ploshchad",
+        # "show_god_postroyki",
         # "short_kapremont_date",
         # "show_to_kapremont",
         # "show_rating_infrastructure",
@@ -34,6 +52,7 @@ class WebsiteAdmin(admin.ModelAdmin):
         # "show_rating_flat",
         "show_rating_all",
         "is_active",
+        # "date_update",
         "show_img",
     ]
     save_on_top = True
@@ -76,6 +95,8 @@ class WebsiteAdmin(admin.ModelAdmin):
         "review_results",
         "district",
         "source_from",
+        LinkTypeFilter,
+        ("date_update", DateFieldListFilter),
     ]
     search_fields = ["id", "address"]
 
@@ -84,9 +105,7 @@ class WebsiteAdmin(admin.ModelAdmin):
             "Общяя информация",
             {
                 "fields": [
-                    (
-                        "address",
-                    ),
+                    ("address",),
                     (
                         "rating_infrastructure",
                         "rating_house",
@@ -97,6 +116,8 @@ class WebsiteAdmin(admin.ModelAdmin):
                         "review_results",
                         "record_status",
                     ),
+                    ("price", "god_postroyki", "gkx_payments", ),
+                    ("file_img", "file_video")
                 ],
             },
         ),
@@ -105,16 +126,20 @@ class WebsiteAdmin(admin.ModelAdmin):
             {
                 "fields": [
                     (
-                        "is_kapremont",
-                        "is_new_lift",
+                        # "is_kapremont",
+                        # "is_new_lift",
                         "is_no_stupenki",
                         "is_musoroprovod",
                     ),
                     ("no_stupenki", "musoroprovod"),
-                    ("god_postroyki", "gkx_payments"),
+                    # ("god_postroyki", "gkx_payments"),
                     (
+                        "is_kapremont",
                         "kapremont_date",
                         "kapremont_diff",
+                    ),
+                    (
+                        "is_new_lift",
                         "lift_date",
                         "lift_diff",
                     ),
@@ -183,7 +208,7 @@ class WebsiteAdmin(admin.ModelAdmin):
                     (
                         "district",
                         "tip_doma",
-                        "price",
+                        # "price",
                         "kolichestvo_komnat",
                         "obshchaya_ploshchad",
                         "etazh_val",
@@ -195,6 +220,47 @@ class WebsiteAdmin(admin.ModelAdmin):
             },
         ),
     ]
+
+    #
+    def changelist_view(self, request, extra_context=None):
+        # queryset = Avito.objects.all()
+        # serializer = WebsiteSerializer(queryset, many=True)
+
+        # # Serialize and attach the chart data to the template context
+        # as_json = json.dumps(list(serializer.data))
+        status = Avito.objects.values("record_status").annotate(
+            count=Count("record_status")
+        )
+
+        status_labels = dict(Avito.RECORD_STATUS_CHOICES)
+        status_data = [["Status", "Count", {"role": "style"}]]
+
+        for row in status:
+            status_data_color = "#e6e6e6"
+            if row["record_status"] == "6":
+                status_data_color = "#00e600"
+            status_data.append(
+                [status_labels[row["record_status"]], row["count"], status_data_color]
+            )
+        status_data = json.dumps(status_data)
+
+        link_type = request.GET.get("link_type", "")
+        history = LogEntry.objects.order_by("-action_time").distinct()[:20]
+        history_lst = []
+        for row in history:
+            if row.object_id not in history_lst:
+                history_lst.append(row.object_id)
+
+        extra_context = extra_context or {
+            "link_type": link_type,
+            "history": history_lst[:5],
+            "status": status_data,
+        }
+
+        return super().changelist_view(
+            request,
+            extra_context=extra_context,
+        )
 
     # Удалить sction delete selected
     # Потом можно вернуть
@@ -246,21 +312,21 @@ class WebsiteAdmin(admin.ModelAdmin):
     def show_kolichestvo_komnat(self, instance):
         return instance.kolichestvo_komnat
 
-    show_kolichestvo_komnat.short_description = "Комнат"
+    show_kolichestvo_komnat.short_description = "К"
     show_kolichestvo_komnat.admin_order_field = "kolichestvo_komnat"
 
     # etazh_val
     def show_etazh_val(self, instance):
         return instance.etazh_val
 
-    show_etazh_val.short_description = "Этаж"
+    show_etazh_val.short_description = "Э"
     show_etazh_val.admin_order_field = "etazh_val"
 
     # obshchaya_ploshchad
     def show_obshchaya_ploshchad(self, instance):
         return instance.obshchaya_ploshchad
 
-    show_obshchaya_ploshchad.short_description = "Площадь"
+    show_obshchaya_ploshchad.short_description = "S"
     show_obshchaya_ploshchad.admin_order_field = "obshchaya_ploshchad"
 
     #
@@ -338,6 +404,9 @@ class WebsiteAdmin(admin.ModelAdmin):
                 obj.is_kapremont = True
             else:
                 obj.is_kapremont = False
+        else:
+            obj.kapremont_diff = None
+            obj.is_kapremont = False
 
         # lift
         if "lift_date" in request.POST and request.POST["lift_date"]:
@@ -349,6 +418,10 @@ class WebsiteAdmin(admin.ModelAdmin):
                 obj.is_new_lift = True
             else:
                 obj.is_new_lift = False
+        else:
+            obj.lift_diff = None
+            obj.is_new_lift = False
+
         # kuxnya
         if "kuxnya" in request.POST and request.POST["kuxnya"] == "2":
             obj.is_kuxnya = True

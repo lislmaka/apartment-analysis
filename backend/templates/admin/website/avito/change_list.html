@@ -1,0 +1,151 @@
+{% extends "admin/change_list.html" %}
+{% load static %}
+
+<!-- Override extrahead to add Chart.js -->
+{% block extrahead %}
+{{ block.super }}
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script data-status="{{ status }}">
+    google.charts.load("current", { packages: ["corechart"] });
+    google.charts.setOnLoadCallback(drawChart);
+    const data = document.currentScript.dataset;
+    function drawChart() {
+        
+
+        var jsonData = $.ajax({
+            url: "http://localhost:1337/api/list/",
+            dataType: "json",
+            async: false
+        }).responseText;
+
+        jsonData = JSON.parse(jsonData);
+
+        var arrRatingHistogram = [['id', 'Value']];
+
+        var arrPriceLine = [['id', 'Value']];
+        var arrPriceHistogram = [['id', 'Value']];
+        for (const key in jsonData) {
+            arrRatingHistogram.push([jsonData[key]["id"].toString(), parseFloat(jsonData[key]["rating_all"])]);
+            arrPriceLine.push([jsonData[key]["id"].toString(), parseInt(jsonData[key]["price"])]);
+            arrPriceHistogram.push([jsonData[key]["id"].toString(), parseInt(jsonData[key]["price"])]);
+        }
+
+        // Create our data table out of JSON data loaded from server.
+        var dataRatingHistogram = new google.visualization.arrayToDataTable(arrRatingHistogram);
+        var optionsRatingHistogram = {
+            title: 'Распределеение квартир по рейтингу',
+            legend: { position: 'none' },
+        };
+        // Create our data table out of JSON data loaded from server.
+        var dataPriceLine = new google.visualization.arrayToDataTable(arrPriceLine);
+        var optionsPriceLine = {
+            title: 'Цены на квартиры',
+            legend: { position: 'none' },
+        };
+
+        // Create our data table out of JSON data loaded from server.
+        var dataPriceHistogram = new google.visualization.arrayToDataTable(arrPriceHistogram);
+        var optionsPriceHistogram = {
+            title: 'Распределение квартир по цене',
+            legend: { position: 'none' },
+        };
+
+        // console.log("sdfsdfsdfsdf")
+        // console.log(data["status"])
+        dataStatus = JSON.parse(data["status"])
+
+        var dataStatusBar = new google.visualization.arrayToDataTable(dataStatus);
+        var optionsDataStatusBar = {
+            title: 'Распределение квартир по текущим статусам',
+            legend: { position: 'none' },
+        };
+
+        var chart = new google.visualization.Histogram(document.getElementById('chart_div'));
+        chart.draw(dataRatingHistogram, optionsRatingHistogram);
+
+        var chart = new google.visualization.Histogram(document.getElementById('chart_div3'));
+        chart.draw(dataPriceHistogram, optionsPriceHistogram);
+
+        var chart = new google.visualization.LineChart(document.getElementById('chart_div2'));
+        chart.draw(dataPriceLine, optionsPriceLine);
+
+        var chart = new google.visualization.BarChart(document.getElementById('chart_div4'));
+        chart.draw(dataStatusBar, optionsDataStatusBar);
+    };
+
+</script>
+{% endblock %}
+
+{% block content %}
+<!-- Test Data -->
+<!-- Render our chart -->
+<div style="width: 100%; display: flex;">
+    <div id="chart_div" style="width: 100%; height: 200px;"></div>
+    <div id="chart_div3" style="width: 100%; height: 200px;"></div>
+    <div id="chart_div2" style="width: 100%; height: 200px;"></div>
+    <div id="chart_div4" style="width: 100%; height: 200px;"></div>
+
+</div>
+
+<!-- <div style="width: 80%;">
+    <canvas style="margin-bottom: 30px; width: 60%; height: 50%;" id="myChart"></canvas>
+</div> -->
+<!-- Render the rest of the ChangeList view -->
+
+<!-- begin filter -->
+<div style="text-align: center; padding: 20px;">
+    {% if link_type == "1" %}
+        <a href="http://localhost:1337/admin/website/avito/?link_type=1" class="href">
+            <button style="text-align: center; padding: 5px 20px; background-color: #00e600;">
+                Базовый вид
+            </button>
+        </a>
+    {% else %}
+        <a href="http://localhost:1337/admin/website/avito/?link_type=1" class="href">
+            <button style="text-align: center; padding: 5px 20px; ">
+                Базовый вид
+            </button>
+        </a>
+    {% endif %}
+
+
+    {% if link_type == "2" %}
+    <a href="http://localhost:1337/admin/website/avito/?o=-3.2&status__exact=1&link_type=2" class="href">
+        <button style="text-align: center; padding: 5px 20px; background-color: #00e600;">
+            Сотрировка по цене и рейтингу
+        </button>
+    </a>
+    {% else %}
+    <a href="http://localhost:1337/admin/website/avito/?o=-3.2&status__exact=1&link_type=2" class="href">
+        <button style="text-align: center; padding: 5px 20px;">
+            Сотрировка по цене и рейтингу
+        </button>
+    </a>
+    {% endif %}
+
+<!-- Last Begin -->
+ {% for obj in history %}
+    <!-- <a href="http://localhost:1337/admin/website/avito/{{obj.object_id}}/change/">{{obj.object_id}}</a> -->
+
+    <a href="#"
+        onclick="window.open('http://localhost:1337/admin/website/avito/{{obj}}/change/',
+                            '_blank',
+                            'width=1100,height=700');
+                return false;"
+    >
+            <button style="text-align: center; padding: 5px 5px; border: 0; background-color: white; cursor: pointer;">
+                {{obj}}
+            </button>
+        </a>
+{% endfor %}
+<!-- Last End -->
+</div>
+
+<!-- end filter -->
+
+<!-- <div style="text-align: center; padding: 20px;">
+
+</div> -->
+{{ block.super }}
+{% endblock %}

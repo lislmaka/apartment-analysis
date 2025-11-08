@@ -9,6 +9,13 @@ from django.db import models
 import datetime
 from django.utils.html import format_html
 
+def image_path(instance, filename):
+    # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
+    return "images/img_{0}.jpg".format(instance.id)
+
+def video_path(instance, filename):
+    # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
+    return "video/video_{0}.mp4".format(instance.id)
 
 class Avito(models.Model):
     DISTRICT_CHOICES = [
@@ -37,10 +44,10 @@ class Avito(models.Model):
 
     RECORD_STATUS_CHOICES = [
         ("1", "Новая"),
-        ("2", "Внесение данных по капремонту"),
-        ("3", "Внесение данных по дому"),     
-        ("4", "Внесение данных по квартире"),  
-        ("5", "Внесение данных по инфраструктуре"), 
+        ("2", "Капремонт"),
+        ("3", "Дом"),     
+        ("4", "Квартира"),  
+        ("5", "Инфраструктура"), 
         ("6", "Все данные внесены"), 
     ]
     
@@ -294,10 +301,13 @@ class Avito(models.Model):
         max_length=50, choices=YESNO_RESULTS_CHOICES, default="1", verbose_name="Наличие мусоропровода в доме"
     )
 
+    file_img = models.FileField(upload_to=image_path, null=True, blank=True, verbose_name="Фото")
+    file_video = models.FileField(upload_to=video_path, null=True, blank=True, verbose_name="Видео")
+
     class Meta:
         managed = False
         db_table = "avito"
-        verbose_name = "Квартира"
+        verbose_name = "Квартиру"
         verbose_name_plural = "Квартиры"
         # ordering = ("-rating", "price", "-god_postroyki")
 

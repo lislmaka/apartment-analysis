@@ -156,4 +156,4 @@ DEBUG_TOOLBAR_CONFIG = {
 }
 
 MEDIA_URL = '/public/'
-MEDIA_ROOT = BASE_DIR / 'piblic'
+MEDIA_ROOT = BASE_DIR / 'public'
