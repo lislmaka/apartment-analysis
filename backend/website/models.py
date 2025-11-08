@@ -128,13 +128,13 @@ class Avito(models.Model):
         verbose_name="Осмотр",
     )
 
-    price = models.CharField(blank=True, null=True, max_length=20, verbose_name="Цена")
+    price = models.IntegerField(blank=True, null=True, verbose_name="Цена")
     address = models.TextField(blank=True, null=True, verbose_name="Адрес")
     seller = models.CharField(
         blank=True, null=True, max_length=250, verbose_name="Продавец"
     )
-    kolichestvo_komnat = models.CharField(
-        blank=True, null=True, max_length=20, verbose_name="Комнат"
+    kolichestvo_komnat = models.IntegerField(
+        blank=True, null=True, verbose_name="Комнат"
     )
     obshchaya_ploshchad = models.FloatField(
         blank=True, null=True, verbose_name="Площадь"
@@ -175,11 +175,11 @@ class Avito(models.Model):
     tip_doma = models.CharField(
         max_length=50, choices=TIP_DOMA_CHOICES, default="", verbose_name="Тип дома"
     )
-    god_postroyki = models.CharField(
-        blank=True, null=True, max_length=20, verbose_name="Год постройки"
+    god_postroyki = models.IntegerField(
+        blank=True, null=True, verbose_name="Год постройки"
     )
-    kapremont_date = models.CharField(
-        blank=True, null=True, max_length=20, verbose_name="Дата капремонта"
+    kapremont_date = models.IntegerField(
+        blank=True, null=True, verbose_name="Дата капремонта"
     )
     kapremont_diff = models.CharField(
         blank=True, null=True, max_length=20, verbose_name="Кол-во лет до капремонта"
@@ -187,13 +187,12 @@ class Avito(models.Model):
     lift_diff = models.CharField(
         blank=True, null=True, max_length=20, verbose_name="Кол-во лет до замены лифта"
     )
-    lift_date = models.CharField(
-        blank=True, null=True, max_length=20, verbose_name="Дата замены лифта"
+    lift_date = models.IntegerField(
+        blank=True, null=True, verbose_name="Дата замены лифта"
     )
-    gkx_payments = models.CharField(
+    gkx_payments = models.IntegerField(
         blank=True,
         null=True,
-        max_length=20,
         verbose_name="Стоимость комунальных платежей",
     )
     etazhey_v_dome = models.TextField(blank=True, null=True)
@@ -201,44 +200,44 @@ class Avito(models.Model):
     gruzovoy_lift = models.TextField(blank=True, null=True)
     dvor = models.TextField(blank=True, null=True)
     parkovka = models.TextField(blank=True, null=True)
-    etazh_val = models.CharField(
-        blank=True, null=True, max_length=20, verbose_name="Этаж"
+    etazh_val = models.IntegerField(
+        blank=True, null=True, verbose_name="Этаж"
     )
-    etazh_count = models.CharField(
-        blank=True, null=True, max_length=20, verbose_name="Этажей"
+    etazh_count = models.IntegerField(
+        blank=True, null=True, verbose_name="Этажей"
     )
-    to_magazin = models.CharField(
-        blank=True, null=True, max_length=20, verbose_name="Магазин"
+    to_magazin = models.IntegerField(
+        blank=True, null=True, verbose_name="Магазин"
     )
-    to_pyaterochka = models.CharField(
-        blank=True, null=True, max_length=20, verbose_name="Пятерочка"
+    to_pyaterochka = models.IntegerField(
+        blank=True, null=True, verbose_name="Пятерочка"
     )
-    to_magnit = models.CharField(
-        blank=True, null=True, max_length=20, verbose_name="Магнит"
+    to_magnit = models.IntegerField(
+        blank=True, null=True, verbose_name="Магнит"
     )
-    to_bolnitsa = models.CharField(
-        blank=True, null=True, max_length=20, verbose_name="Больница"
+    to_bolnitsa = models.IntegerField(
+        blank=True, null=True, verbose_name="Больница"
     )
-    to_pochta = models.CharField(
-        blank=True, null=True, max_length=20, verbose_name="Почта"
+    to_pochta = models.IntegerField(
+        blank=True, null=True, verbose_name="Почта"
     )
-    to_bank = models.CharField(
-        blank=True, null=True, max_length=20, verbose_name="Банк"
+    to_bank = models.IntegerField(
+        blank=True, null=True, verbose_name="Банк"
     )
-    to_apteka = models.CharField(
-        blank=True, null=True, max_length=20, verbose_name="Аптека"
+    to_apteka = models.IntegerField(
+        blank=True, null=True, verbose_name="Аптека"
     )
-    to_ozon = models.CharField(
-        blank=True, null=True, max_length=20, verbose_name="Ozon"
+    to_ozon = models.IntegerField(
+        blank=True, null=True, verbose_name="Ozon"
     )
-    to_wildberries = models.CharField(
-        blank=True, null=True, max_length=20, verbose_name="Wildberries"
+    to_wildberries = models.IntegerField(
+        blank=True, null=True, verbose_name="Wildberries"
     )
-    to_yandex = models.CharField(
-        blank=True, null=True, max_length=20, verbose_name="Yandex"
+    to_yandex = models.IntegerField(
+        blank=True, null=True, verbose_name="Yandex"
     )
-    to_bus_stop = models.CharField(
-        blank=True, null=True, max_length=20, verbose_name="Остановка"
+    to_bus_stop = models.IntegerField(
+        blank=True, null=True, verbose_name="Остановка"
     )
     # status = models.CharField(
     #     blank=True, null=True, max_length=100, verbose_name="Статус"

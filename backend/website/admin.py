@@ -90,6 +90,7 @@ class WebsiteAdmin(admin.ModelAdmin):
 
     formfield_overrides = {
         models.CharField: {"widget": TextInput(attrs={"size": "10"})},
+        models.IntegerField: {"widget": TextInput(attrs={"size": "10"})},
         models.FloatField: {"widget": TextInput(attrs={"size": "10"})},
         models.TextField: {"widget": Textarea(attrs={"rows": 5, "cols": 30})},
     }
@@ -213,13 +214,12 @@ class WebsiteAdmin(admin.ModelAdmin):
                     (
                         "district",
                         "tip_doma",
-                        # "price",
-                        "kolichestvo_komnat",
+                    ),
+                    (
                         "obshchaya_ploshchad",
+                        "kolichestvo_komnat",
                         "etazh_val",
                         "etazh_count",
-                        # "god_postroyki",
-                        # "kapremont_date",
                     ),
                 ],
             },
