@@ -11,11 +11,11 @@ from django.utils.html import format_html
 
 def image_path(instance, filename):
     # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
-    return "images/img_{0}.jpg".format(instance.id)
+    return "images/{}/main.jpg".format(instance.id)
 
 def video_path(instance, filename):
     # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
-    return "video/video_{0}.mp4".format(instance.id)
+    return "video/{}/main.mp4".format(instance.id)
 
 class Avito(models.Model):
     DISTRICT_CHOICES = [

@@ -681,8 +681,12 @@ def show_flat_image(instance):
         images_html_begin = '<div style="display: flex; justify-content: center; align-items: center; border-radius: 5px; {}">'.format(
             bg_color
         )
-        images_html = '<img src="/static/flats/{}/main.jpg" width="150" height="150" style="padding-bottom: 10px; ">'.format(
-            instance.id
+
+        file_name = f"images/{instance.id}/main.jpg"
+        if instance.file_img:
+            file_name = instance.file_img
+        images_html = '<img src="/public/{}" width="150" height="150" style="padding-bottom: 10px; ">'.format(
+            file_name
         )
         #
         to_edit = format_html(
