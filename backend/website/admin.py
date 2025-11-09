@@ -12,7 +12,7 @@ from django.utils.html import format_html
 import website.admin_helpers as myutils
 import website.admin_actions as aa
 from website.admin_ratings import (
-    calculate_rating_infrastructure,
+    calculate_rating_infrastructure2,
     calculate_rating_flat,
     calculate_rating_house,
 )
@@ -242,7 +242,7 @@ class WebsiteAdmin(admin.ModelAdmin):
 
         for row in status:
             status_data_color = "#e6e6e6"
-            if row["record_status"] == "6":
+            if row["record_status"] == "2":
                 status_data_color = "#00e600"
             status_data.append(
                 [status_labels[row["record_status"]], row["count"], status_data_color]
@@ -478,13 +478,13 @@ class WebsiteAdmin(admin.ModelAdmin):
             obj.is_musoroprovod = False
 
         # no_stupenki
-        if "no_stupenki" in request.POST and request.POST["no_stupenki"] == "3":
+        if "no_stupenki" in request.POST and request.POST["no_stupenki"] == "2":
             obj.is_no_stupenki = True
         else:
             obj.is_no_stupenki = False
 
         # calculate rating
-        rating_infrastructure = calculate_rating_infrastructure(obj)
+        rating_infrastructure = calculate_rating_infrastructure2(obj)
         rating_house = calculate_rating_house(obj)
         rating_flat = calculate_rating_flat(obj)
         obj.rating_infrastructure = rating_infrastructure

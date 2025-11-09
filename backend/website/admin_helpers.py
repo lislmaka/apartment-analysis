@@ -1,6 +1,14 @@
 from django.utils.html import format_html
 
 
+colors = {
+    "1": "#f2f2f2",
+    "2": "#00e600",
+    "3": "#ffb3b3",
+    "4": "#e6e600",
+}
+
+
 def show_info33(instance):
     record_status = show_record_status(instance)
     infrastructure_info = show_infrastructure_info(instance)
@@ -127,42 +135,48 @@ def show_house_flat(instance):
     d = {
         "is_kuxnya": {
             "title": "Кухня",
-            "instance": instance.is_kuxnya,
+            "instance": instance.kuxnya,
             "rez": None,
         },
         "is_tualet": {
             "title": "Туалет",
-            "instance": instance.is_tualet,
+            "instance": instance.tualet,
             "rez": None,
         },
         "is_vana": {
             "title": "Ванна",
-            "instance": instance.is_vana,
+            "instance": instance.vana,
             "rez": None,
         },
         "is_balkon": {
             "title": "Балкон",
-            "instance": instance.is_balkon,
+            "instance": instance.balkon,
             "rez": None,
         },
         "is_neighbors_around": {
             "title": "Соседи &#8660;",
-            "instance": instance.is_neighbors_around,
+            "instance": instance.neighbors_around,
             "rez": None,
         },
         "is_neighbors_top": {
             "title": "Соседи &#8657;",
-            "instance": instance.is_neighbors_top,
+            "instance": instance.neighbors_top,
             "rez": None,
         },
         "is_door": {
             "title": "Дверь",
-            "instance": instance.is_door,
+            "instance": instance.door,
             "rez": None,
         },
     }
     for item in d:
-        d[item]["rez"] = calc_item_flat(d[item]["instance"], d[item]["title"])
+        # d[item]["rez"] = calc_item_flat(d[item]["instance"], d[item]["title"])
+        if d[item]["instance"]:
+            d[item]["rez"] = show_item(
+                colors[d[item]["instance"]], d[item]["title"], ""
+            )
+        else:
+            d[item]["rez"] = show_item(colors["1"], d[item]["title"], "")
 
     to_obj = """<div style="">{} {} {} {} {} {} {} {}</div>""".format(
         show_item("#cccccc", "Квартира", ""),
@@ -187,29 +201,71 @@ def show_house_info(instance):
             "val": instance.kapremont_diff,
             "rez": None,
         },
-        "is_no_stupenki": {
-            "title": "Ступеньки",
-            "instance": instance.is_no_stupenki,
-            "val": None,
-            "rez": None,
-        },
-        "is_musoroprovod": {
-            "title": "Мусоропровод",
-            "instance": instance.is_musoroprovod,
-            "val": None,
-            "rez": None,
-        },
         "is_new_lift": {
             "title": "Лифт",
             "instance": instance.is_new_lift,
             "val": instance.lift_diff,
             "rez": None,
         },
+        "is_no_stupenki": {
+            "title": "Ступеньки",
+            "instance": instance.no_stupenki,
+            "val": None,
+            "rez": None,
+        },
+        "is_musoroprovod": {
+            "title": "Мусоропровод",
+            "instance": instance.musoroprovod,
+            "val": None,
+            "rez": None,
+        },
     }
     for item in d:
-        d[item]["rez"] = calc_item_house(
-            d[item]["instance"], d[item]["title"], d[item]["val"]
-        )
+        if item == "is_kapremont":
+            if d[item]["instance"]:
+                d[item]["rez"] = show_item(
+                    colors["2"], d[item]["title"], d[item]["val"]
+                )
+            elif not d[item]["instance"] and instance.kapremont_date:
+                d[item]["rez"] = show_item(
+                    colors["3"], d[item]["title"], d[item]["val"]
+                )
+            elif (
+                not d[item]["instance"]
+                and not instance.kapremont_date
+                and instance.record_status != "1"
+            ):
+                d[item]["rez"] = show_item(colors["4"], d[item]["title"], "")
+            else:
+                d[item]["rez"] = show_item(colors["1"], d[item]["title"], "")
+
+        elif item == "is_new_lift":
+            if d[item]["instance"]:
+                d[item]["rez"] = show_item(
+                    colors["2"], d[item]["title"], d[item]["val"]
+                )
+            elif not d[item]["instance"] and instance.lift_date:
+                d[item]["rez"] = show_item(
+                    colors["3"], d[item]["title"], d[item]["val"]
+                )
+            elif (
+                not d[item]["instance"]
+                and not instance.lift_date
+                and instance.record_status != "1"
+            ):
+                d[item]["rez"] = show_item(colors["4"], d[item]["title"], "")
+            else:
+                d[item]["rez"] = show_item(colors["1"], d[item]["title"], "")
+        else:
+            # d[item]["rez"] = calc_item_house(
+            #     d[item]["instance"], d[item]["title"], d[item]["val"]
+            # )
+            if d[item]["instance"]:
+                d[item]["rez"] = show_item(
+                    colors[d[item]["instance"]], d[item]["title"], ""
+                )
+            else:
+                d[item]["rez"] = show_item(colors["1"], d[item]["title"], "")
 
     to_obj = """<div style="">{} {} {} {} {}</div>""".format(
         show_item("#cccccc", "Дом", ""),
@@ -230,7 +286,7 @@ def show_infrastructure_info(instance):
         "Пятерочка",
         "Магнит",
         # "Аптека",
-        "Остановка",
+        # "Остановка",
         "Ozon",
         "WB",
         "YM",
@@ -322,46 +378,91 @@ def show_infrastructure_info(instance):
     if delivery_sum:
         delivery_avg = int(sum(delivery_sum) / len(delivery_sum))
 
-    deliverys_item = show_item("#ffb3b3", "Доставка", delivery_avg)
-    mags_item = show_item("#ffb3b3", "Сетевые", mags_avg)
-    for item in d:
-        d[item]["rez"] = calc_item_infrastructure(
-            d[item]["instance"],
-            d[item]["title"],
-            rating_infrastructure,
-            rating_infrastructure_deliveris,
-            rating_infrastructure_mags,
-            distance,
-        )
-        if (
-            d[item]["title"] in rating_infrastructure_deliveris
-            and d[item]["rez"]
-            and int(d[item]["instance"]) <= distance
-        ):
-            deliverys_item = show_item("#00e600", "Доставка", delivery_avg)
-        if (
-            d[item]["title"] in rating_infrastructure_mags
-            and d[item]["rez"]
-            and int(d[item]["instance"]) <= distance
-        ):
-            mags_item = show_item("#00e600", "Сетевые", mags_avg)
+    if instance.record_status == "1":
+        deliverys_item = show_item(colors["1"], "Доставка", delivery_avg)
+        mags_item = show_item(colors["1"], "Сетевые", mags_avg)
+        for item in d:
+            d[item]["rez"] = calc_item_infrastructure(
+                d[item]["instance"],
+                d[item]["title"],
+                rating_infrastructure,
+                rating_infrastructure_deliveris,
+                rating_infrastructure_mags,
+                distance,
+            )
+            if (
+                d[item]["title"] in rating_infrastructure_deliveris
+                and d[item]["rez"]
+                and int(d[item]["instance"]) <= distance
+            ):
+                deliverys_item = show_item("#00e600", "Доставка", delivery_avg)
+            if (
+                d[item]["title"] in rating_infrastructure_mags
+                and d[item]["rez"]
+                and int(d[item]["instance"]) <= distance
+            ):
+                mags_item = show_item("#00e600", "Сетевые", mags_avg)
+    elif instance.record_status == "2":
+        deliverys_item = show_item(colors["4"], "Доставка", delivery_avg)
+        mags_item = show_item(colors["4"], "Сетевые", mags_avg)
+        for item in d:
+            d[item]["rez"] = calc_item_infrastructure(
+                d[item]["instance"],
+                d[item]["title"],
+                rating_infrastructure,
+                rating_infrastructure_deliveris,
+                rating_infrastructure_mags,
+                distance,
+            )
+            if (
+                d[item]["title"] in rating_infrastructure_deliveris
+                and d[item]["rez"]
+                and int(d[item]["instance"]) <= distance
+            ):
+                deliverys_item = show_item("#00e600", "Доставка", delivery_avg)
+            if (
+                d[item]["title"] in rating_infrastructure_mags
+                and d[item]["rez"]
+                and int(d[item]["instance"]) <= distance
+            ):
+                mags_item = show_item("#00e600", "Сетевые", mags_avg)
+    else:
+        deliverys_item = show_item("#ffb3b3", "Доставка", delivery_avg)
+        mags_item = show_item("#ffb3b3", "Сетевые", mags_avg)
+        for item in d:
+            d[item]["rez"] = calc_item_infrastructure(
+                d[item]["instance"],
+                d[item]["title"],
+                rating_infrastructure,
+                rating_infrastructure_deliveris,
+                rating_infrastructure_mags,
+                distance,
+            )
+            if (
+                d[item]["title"] in rating_infrastructure_deliveris
+                and d[item]["rez"]
+                and int(d[item]["instance"]) <= distance
+            ):
+                deliverys_item = show_item("#00e600", "Доставка", delivery_avg)
+            if (
+                d[item]["title"] in rating_infrastructure_mags
+                and d[item]["rez"]
+                and int(d[item]["instance"]) <= distance
+            ):
+                mags_item = show_item("#00e600", "Сетевые", mags_avg)
 
-    to_obj_main = """<div style="">{} {} {} {}</div>""".format(
+    to_obj_main = """<div style="">{} {} {}</div>""".format(
         show_item("#cccccc", "Инфраструктура", ""),
         mags_item,
-        d["to_bus_stop"]["rez"],
         deliverys_item,
-        # d["to_magazin"]["rez"],
-        # d["to_bolnitsa"]["rez"],
-        # d["to_pochta"]["rez"],
-        # d["to_bank"]["rez"],
     )
-    to_obj_seccond = """<div style="">{} {} {} {} {}</div>""".format(
+    to_obj_seccond = """<div style="">{} {} {} {} {} {}</div>""".format(
         d["to_magazin"]["rez"],
         d["to_bolnitsa"]["rez"],
         d["to_pochta"]["rez"],
         d["to_bank"]["rez"],
         d["to_apteka"]["rez"],
+        d["to_bus_stop"]["rez"],
     )
     to_obj_html = format_html(
         "{} {}", format_html(to_obj_main), format_html(to_obj_seccond)
@@ -371,9 +472,11 @@ def show_infrastructure_info(instance):
 
 
 def show_record_status(instance):
-    status = show_item(
-        "#e6e6e6", instance.get_record_status_display(), f"[{instance.record_status}]"
-    )
+    bg_color = "#e6e6e6"
+    if instance.record_status == "2":
+        bg_color = "#00e600"
+
+    status = show_item(bg_color, instance.get_record_status_display(), "")
     bg_color = "#e6e6e6"
     if instance.review_results == "2":
         bg_color = "#00e600"
@@ -627,14 +730,14 @@ def maps(instance):
         instance.address,
     )
 
-#     to_address_on_map_google_all = format_html(
-#         """<a href="#"
-#     onclick="window.open('https://www.google.com/maps/d/edit?mid=1CqEeIWmaLPMRzZq0li8Mv9vylvzM9YY&usp=sharing',
-#                          '_blank',
-#                          'width=1100,height=700');
-#               return false;"
-#  >GoogleAll</a>"""
-#     )
+    #     to_address_on_map_google_all = format_html(
+    #         """<a href="#"
+    #     onclick="window.open('https://www.google.com/maps/d/edit?mid=1CqEeIWmaLPMRzZq0li8Mv9vylvzM9YY&usp=sharing',
+    #                          '_blank',
+    #                          'width=1100,height=700');
+    #               return false;"
+    #  >GoogleAll</a>"""
+    #     )
 
     to_avito = format_html(
         """<a href="#"
@@ -680,34 +783,34 @@ def maps(instance):
 
 
 def show_flat_image(instance):
-        bg_color = ""
-        if instance.review_results == "1":
-            bg_color = "background-color: #e6e6e6;"
-        elif instance.review_results == "2":
-            bg_color = "background-color: #00e600;"
-        elif instance.review_results == "3":
-            bg_color = "background-color: #ffb3b3;"
-        images_html_begin = '<div style="display: flex; justify-content: center; align-items: center; border-radius: 5px; {}">'.format(
-            bg_color
-        )
+    bg_color = ""
+    if instance.review_results == "1":
+        bg_color = "background-color: #e6e6e6;"
+    elif instance.review_results == "2":
+        bg_color = "background-color: #00e600;"
+    elif instance.review_results == "3":
+        bg_color = "background-color: #ffb3b3;"
+    images_html_begin = '<div style="display: flex; justify-content: center; align-items: center; border-radius: 5px; {}">'.format(
+        bg_color
+    )
 
-        file_name = f"images/{instance.id}/main.jpg"
-        if instance.file_img:
-            file_name = instance.file_img
-        images_html = '<img src="/public/{}" width="150" height="150" style="padding-bottom: 10px; ">'.format(
-            file_name
-        )
-        #
-        to_edit = format_html(
-            """<a href="#"
+    file_name = f"images/{instance.id}/main.jpg"
+    if instance.file_img:
+        file_name = instance.file_img
+    images_html = '<img src="/public/{}" width="150" height="150" style="padding-bottom: 10px; ">'.format(
+        file_name
+    )
+    #
+    to_edit = format_html(
+        """<a href="#"
         onclick="window.open('http://localhost:1337/admin/website/avito/{}/change/',
                             '_blank',
                             'width=1100,height=700');
                 return false;"
     >{}</a>""",
-            instance.id,
-            format_html(images_html),
-        )
+        instance.id,
+        format_html(images_html),
+    )
     #     video = format_html(
     #       """<div><a href="#"
     #     onclick="window.open('http://localhost:1337/static/video/video.html',
@@ -717,10 +820,13 @@ def show_flat_image(instance):
     # >{}</a></div>""",
     #         "Видео",
     #     )
-        video = ""
-        if instance.file_video:
-            video = format_html("""<a href="http://localhost:1337/public/{}" target="_blank"">Видео отчет</>""", instance.file_video)
-        #
-        images_html_end = "</div>"
-        to_edit = images_html_begin + to_edit + images_html_end + video
-        return format_html(to_edit)    
+    video = ""
+    if instance.file_video:
+        video = format_html(
+            """<a href="http://localhost:1337/public/{}" target="_blank"">Видео отчет</>""",
+            instance.file_video,
+        )
+    #
+    images_html_end = "</div>"
+    to_edit = images_html_begin + to_edit + images_html_end + video
+    return format_html(to_edit)

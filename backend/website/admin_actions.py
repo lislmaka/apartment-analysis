@@ -4,7 +4,7 @@ from django.http import HttpResponse
 from website.admin_ratings import (
     calculate_rating_flat,
     calculate_rating_house,
-    calculate_rating_infrastructure,
+    calculate_rating_infrastructure2,
 )
 
 
@@ -84,7 +84,7 @@ def action_make_inactive(queryset):
 
 def action_recalc_all_ratings(queryset):
     for flat in queryset:
-        rating_infrastructure = calculate_rating_infrastructure(flat)
+        rating_infrastructure = calculate_rating_infrastructure2(flat)
         rating_house = calculate_rating_house(flat)
         rating_flat = calculate_rating_flat(flat)
         flat.rating_infrastructure = rating_infrastructure

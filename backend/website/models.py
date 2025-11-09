@@ -47,11 +47,7 @@ class Avito(models.Model):
 
     RECORD_STATUS_CHOICES = [
         ("1", "Новая"),
-        ("2", "Капремонт"),
-        ("3", "Дом"),
-        ("4", "Квартира"),
-        ("5", "Инфраструктура"),
-        ("6", "Все данные внесены"),
+        ("2", "Все данные внесены"),
     ]
 
     REVIEW_RESULTS_CHOICES = [
@@ -331,7 +327,7 @@ class Avito(models.Model):
         max_length=50,
         choices=YESNO_RESULTS_CHOICES,
         default="1",
-        verbose_name="Наличие ступенек при входе в подьезд",
+        verbose_name="Нет ступенек при входе в подьезд",
     )
     musoroprovod = models.CharField(
         max_length=50,
