@@ -32,6 +32,28 @@ class LinkTypeFilter(admin.SimpleListFilter):
     def queryset(self, request, queryset):
         return queryset
 
+class PriceFilter(admin.SimpleListFilter):
+    title = "Фильтр по цене"
+    parameter_name = "price_filter"
+    # template = "admin/hidden_filter.html"
+
+    def lookups(self, request, model_admin):
+        return [
+            ("more5", "Больше 5 млн.р."),
+            ("less5", "Мельше 5 млн.р."),
+        ]
+
+    def queryset(self, request, queryset):
+        if self.value() == "more5":
+            return queryset.filter(
+                price__gt="5000000",
+                # price__gte=date(1989, 12, 31),
+            )
+        if self.value() == "less5":
+            return queryset.filter(
+                price__lte="5000000",
+            )
+
 
 class WebsiteAdmin(admin.ModelAdmin):
     # class Media:
@@ -96,6 +118,7 @@ class WebsiteAdmin(admin.ModelAdmin):
     }
     list_filter = [
         "status",
+        PriceFilter,
         "record_status",
         "review_results",
         "district",
