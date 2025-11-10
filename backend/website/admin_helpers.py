@@ -79,38 +79,17 @@ def show_description(instance):
 def calc_item_infrastructure(
     obj,
     title,
-    rating_infrastructure,
-    rating_infrastructure_deliveris,
-    rating_infrastructure_mags,
     distance=500,
 ):
     background_color = ""
     if obj:
-        if int(obj) <= distance and (title in rating_infrastructure):
-            background_color = "#00e600"
-        elif int(obj) > distance and (title in rating_infrastructure):
-            background_color = "#ffb3b3"
-        elif int(obj) <= distance:
+        if int(obj) <= distance:
             background_color = "#b3b3ff"
         else:
             background_color = "#ffe0b3"
         return show_item(background_color, title, obj)
     else:
-        if (
-            title in rating_infrastructure
-            and title not in rating_infrastructure_deliveris
-            and title not in rating_infrastructure_mags
-        ):
-            background_color = "#ffb3b3"
-            return show_item(background_color, title, "")
-        # elif (
-        #     title in rating_infrastructure
-        #     and title not in rating_infrastructure_mags
-        # ):
-        #     background_color = "#ffb3b3"
-        #     return show_item(background_color, title, "")
-        else:
-            return ""
+        return ""
 
 
 def calc_item_house(obj, title, val):
@@ -173,13 +152,20 @@ def show_house_flat(instance):
         },
     }
     for item in d:
-        # d[item]["rez"] = calc_item_flat(d[item]["instance"], d[item]["title"])
-        if d[item]["instance"]:
-            d[item]["rez"] = show_item(
-                colors[d[item]["instance"]], d[item]["title"], ""
-            )
-        else:
-            d[item]["rez"] = show_item(colors["1"], d[item]["title"], "")
+        if instance.record_status == "1":
+            if d[item]["instance"]:
+                d[item]["rez"] = show_item(
+                    colors[d[item]["instance"]], d[item]["title"], ""
+                )
+            else:
+                d[item]["rez"] = show_item(colors["1"], d[item]["title"], "")
+        if instance.record_status == "2":
+            if d[item]["instance"] and int(d[item]["instance"]) > 1:
+                d[item]["rez"] = show_item(
+                    colors[d[item]["instance"]], d[item]["title"], ""
+                )
+            else:
+                d[item]["rez"] = show_item(colors["4"], d[item]["title"], "")
 
     to_obj = """<div style="">{} {} {} {} {} {} {} {}</div>""".format(
         show_item("#cccccc", "Квартира", ""),
@@ -260,15 +246,17 @@ def show_house_info(instance):
             else:
                 d[item]["rez"] = show_item(colors["1"], d[item]["title"], "")
         else:
-            # d[item]["rez"] = calc_item_house(
-            #     d[item]["instance"], d[item]["title"], d[item]["val"]
-            # )
-            if d[item]["instance"]:
+            if d[item]["instance"] and instance.record_status == "1":
                 d[item]["rez"] = show_item(
                     colors[d[item]["instance"]], d[item]["title"], ""
                 )
+            elif d[item]["instance"] == "1" and instance.record_status == "2":
+                d[item]["rez"] = show_item(colors["4"], d[item]["title"], "")
             else:
-                d[item]["rez"] = show_item(colors["1"], d[item]["title"], "")
+                if d[item]["instance"]:
+                    d[item]["rez"] = show_item(colors[d[item]["instance"]], d[item]["title"], "")
+                else:
+                    d[item]["rez"] = show_item(colors["1"], d[item]["title"], "")
 
     to_obj = """<div style="">{} {} {} {} {}</div>""".format(
         show_item("#cccccc", "Дом", ""),
@@ -284,31 +272,26 @@ def show_house_info(instance):
 
 def show_infrastructure_info(instance):
     distance = 500
-    rating_infrastructure = [
-        # "Магазин",
-        "Пятерочка",
-        "Магнит",
-        # "Аптека",
-        # "Остановка",
-        "Ozon",
-        "WB",
-        "YM",
-    ]
-    rating_infrastructure_deliveris = [
-        "Ozon",
-        "WB",
-        "YM",
-    ]
-    rating_infrastructure_mags = [
-        "Пятерочка",
-        "Магнит",
-    ]
-    d = {
-        "to_magazin": {
-            "title": "Магазин",
-            "instance": instance.to_magazin,
-            "rez": None,
-        },
+    # rating_infrastructure = [
+    #     # "Магазин",
+    #     "Пятерочка",
+    #     "Магнит",
+    #     # "Аптека",
+    #     # "Остановка",
+    #     "Ozon",
+    #     "WB",
+    #     "YM",
+    # ]
+    # rating_infrastructure_deliveris = [
+    #     "Ozon",
+    #     "WB",
+    #     "YM",
+    # ]
+    # rating_infrastructure_mags = [
+    #     "Пятерочка",
+    #     "Магнит",
+    # ]
+    d1 = {
         "to_pyaterochka": {
             "title": "Пятерочка",
             "instance": instance.to_pyaterochka,
@@ -317,6 +300,28 @@ def show_infrastructure_info(instance):
         "to_magnit": {
             "title": "Магнит",
             "instance": instance.to_magnit,
+            "rez": None,
+        },
+        "to_ozon": {
+            "title": "Ozon",
+            "instance": instance.to_ozon,
+            "rez": None,
+        },
+        "to_wildberries": {
+            "title": "WB",
+            "instance": instance.to_wildberries,
+            "rez": None,
+        },
+        "to_yandex": {
+            "title": "YM",
+            "instance": instance.to_yandex,
+            "rez": None,
+        },
+    }
+    d = {
+        "to_magazin": {
+            "title": "Магазин",
+            "instance": instance.to_magazin,
             "rez": None,
         },
         "to_bus_stop": {
@@ -344,119 +349,59 @@ def show_infrastructure_info(instance):
             "instance": instance.to_apteka,
             "rez": None,
         },
-        "to_ozon": {
-            "title": "Ozon",
-            "instance": instance.to_ozon,
-            "rez": None,
-        },
-        "to_wildberries": {
-            "title": "WB",
-            "instance": instance.to_wildberries,
-            "rez": None,
-        },
-        "to_yandex": {
-            "title": "YM",
-            "instance": instance.to_yandex,
-            "rez": None,
-        },
     }
 
-    mags_sum = []
-    mags_avg = ""
-    if d["to_pyaterochka"]["instance"]:
-        mags_sum.append(int(d["to_pyaterochka"]["instance"]))
-    if d["to_magnit"]["instance"]:
-        mags_sum.append(int(d["to_magnit"]["instance"]))
-    if mags_sum:
-        mags_avg = min(mags_sum)
+    mags_lst = []
+    mags_min = None
+    if d1["to_pyaterochka"]["instance"]:
+        mags_lst.append(int(d1["to_pyaterochka"]["instance"]))
+    if d1["to_magnit"]["instance"]:
+        mags_lst.append(int(d1["to_magnit"]["instance"]))
+    if mags_lst:
+        mags_min = min(mags_lst)
 
-    delivery_sum = []
-    delivery_avg = ""
-    if d["to_ozon"]["instance"]:
-        delivery_sum.append(int(d["to_ozon"]["instance"]))
-    if d["to_wildberries"]["instance"]:
-        delivery_sum.append(int(d["to_wildberries"]["instance"]))
-    if d["to_yandex"]["instance"]:
-        delivery_sum.append(int(d["to_yandex"]["instance"]))
-    if delivery_sum:
-        delivery_avg = int(sum(delivery_sum) / len(delivery_sum))
+    delivery_lst = []
+    delivery_min = None
+    if d1["to_ozon"]["instance"]:
+        delivery_lst.append(int(d1["to_ozon"]["instance"]))
+    if d1["to_wildberries"]["instance"]:
+        delivery_lst.append(int(d1["to_wildberries"]["instance"]))
+    if d1["to_yandex"]["instance"]:
+        delivery_lst.append(int(d1["to_yandex"]["instance"]))
+    if delivery_lst:
+        delivery_min = min(delivery_lst)
 
-    if instance.record_status == "1":
-        deliverys_item = show_item(colors["1"], "Доставка", delivery_avg)
-        mags_item = show_item(colors["1"], "Сетевые", mags_avg)
-        for item in d:
-            d[item]["rez"] = calc_item_infrastructure(
-                d[item]["instance"],
-                d[item]["title"],
-                rating_infrastructure,
-                rating_infrastructure_deliveris,
-                rating_infrastructure_mags,
-                distance,
-            )
-            if (
-                d[item]["title"] in rating_infrastructure_deliveris
-                and d[item]["rez"]
-                and int(d[item]["instance"]) <= distance
-            ):
-                deliverys_item = show_item("#00e600", "Доставка", delivery_avg)
+# 
+    if instance.record_status == "1" or instance.record_status == "2":
+        if (delivery_min is not None and delivery_min <= distance):
+            deliverys_item = show_item(colors["2"], "Доставка", delivery_min)
+        elif (delivery_min is not None and delivery_min > distance):
+            deliverys_item = show_item(colors["3"], "Доставка", delivery_min)
+        else:
+            deliverys_item = show_item(colors["1"], "Доставка", "")
+
+        if (mags_min is not None and mags_min <= distance):
+            mags_item = show_item(colors["2"], "Сетевые", mags_min)
+        elif (mags_min is not None and mags_min > distance):
+            mags_item = show_item(colors["3"], "Сетевые", mags_min)
+        else:
+            mags_item = show_item(colors["1"], "Сетевые", "")
+    if instance.record_status == "2" and mags_min is None:
+        mags_item = show_item(colors["4"], "Сетевые", "")
+    if instance.record_status == "2" and delivery_min is None:
+        deliverys_item = show_item(colors["4"], "Доставка", "")
+
+
+    for item in d:
+        if d[item]["instance"]: 
+            if int(d[item]["instance"]) <= distance:
+                d[item]["rez"] = show_item("#b3b3ff", d[item]["title"], d[item]["instance"])
+        
             else:
-                deliverys_item = show_item(colors["4"], "Доставка", delivery_avg)
-            if (
-                d[item]["title"] in rating_infrastructure_mags
-                and d[item]["rez"]
-                and int(d[item]["instance"]) <= distance
-            ):
-                mags_item = show_item("#00e600", "Сетевые", mags_avg)
-            else:
-                mags_item = show_item(colors["4"], "Сетевые", mags_avg)
-    elif instance.record_status == "2":
-        deliverys_item = show_item(colors["4"], "Доставка", delivery_avg)
-        mags_item = show_item(colors["4"], "Сетевые", mags_avg)
-        for item in d:
-            d[item]["rez"] = calc_item_infrastructure(
-                d[item]["instance"],
-                d[item]["title"],
-                rating_infrastructure,
-                rating_infrastructure_deliveris,
-                rating_infrastructure_mags,
-                distance,
-            )
-            if (
-                d[item]["title"] in rating_infrastructure_deliveris
-                and d[item]["rez"]
-                and int(d[item]["instance"]) <= distance
-            ):
-                deliverys_item = show_item("#00e600", "Доставка", delivery_avg)
-            if (
-                d[item]["title"] in rating_infrastructure_mags
-                and d[item]["rez"]
-                and int(d[item]["instance"]) <= distance
-            ):
-                mags_item = show_item("#00e600", "Сетевые", mags_avg)
-    else:
-        deliverys_item = show_item("#ffb3b3", "Доставка", delivery_avg)
-        mags_item = show_item("#ffb3b3", "Сетевые", mags_avg)
-        for item in d:
-            d[item]["rez"] = calc_item_infrastructure(
-                d[item]["instance"],
-                d[item]["title"],
-                rating_infrastructure,
-                rating_infrastructure_deliveris,
-                rating_infrastructure_mags,
-                distance,
-            )
-            if (
-                d[item]["title"] in rating_infrastructure_deliveris
-                and d[item]["rez"]
-                and int(d[item]["instance"]) <= distance
-            ):
-                deliverys_item = show_item("#00e600", "Доставка", delivery_avg)
-            if (
-                d[item]["title"] in rating_infrastructure_mags
-                and d[item]["rez"]
-                and int(d[item]["instance"]) <= distance
-            ):
-                mags_item = show_item("#00e600", "Сетевые", mags_avg)
+                d[item]["rez"] = show_item("#ffe0b3", d[item]["title"], d[item]["instance"])
+        else:
+            d[item]["rez"] = ""
+
 
     to_obj_main = """<div style="">{} {} {}</div>""".format(
         show_item("#cccccc", "Инфраструктура", ""),

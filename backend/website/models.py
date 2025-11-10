@@ -345,6 +345,8 @@ class Avito(models.Model):
         verbose_name="Нет ступенек при входе в подьезд",
     )
     musoroprovod = models.CharField(
+        null=False,
+        blank=False,
         max_length=50,
         choices=YESNO_RESULTS_CHOICES,
         default="1",
