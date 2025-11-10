@@ -33,6 +33,7 @@ class Avito(models.Model):
         ("кирпичный", "кирпичный"),
         ("панельный", "панельный"),
         ("монолитно-кирпичный", "монолитно-кирпичный"),
+        ("блочный", "блочный"), 
         ("", "Не указано"),
     ]
 
@@ -48,6 +49,12 @@ class Avito(models.Model):
     RECORD_STATUS_CHOICES = [
         ("1", "Новая"),
         ("2", "Все данные внесены"),
+    ]
+
+    PLITA_CHOICES = [
+        ("1", "Газ"),
+        ("2", "Электричество"),
+        ("", "Не указано"),
     ]
 
     REVIEW_RESULTS_CHOICES = [
@@ -76,11 +83,11 @@ class Avito(models.Model):
         auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
     )
     url = models.TextField(blank=True, null=True, verbose_name="Url адрес")
-    date_add = models.CharField(
-        blank=True, null=True, max_length=50, verbose_name="Дата добавления"
+    date_add = models.DateTimeField(
+        blank=True, null=True, verbose_name="Дата добавления"
     )
-    date_update = models.CharField(
-        blank=True, null=True, max_length=50, verbose_name="Дата обновления"
+    date_update = models.DateTimeField(
+        blank=True, null=True, verbose_name="Дата обновления"
     )
     title = models.TextField(blank=True, null=True, verbose_name="Заголовок")
     description = models.TextField(
@@ -89,9 +96,17 @@ class Avito(models.Model):
     description_minus = models.TextField(
         blank=True, null=True, default="", verbose_name="Недостатки"
     )
+    plita = models.CharField(
+        # blank=True,
+        # null=True,
+        max_length=50,
+        choices=PLITA_CHOICES,
+        default="",
+        verbose_name="Плита",
+    )
     district = models.CharField(
-        blank=True,
-        null=True,
+        # blank=True,
+        # null=True,
         max_length=50,
         choices=DISTRICT_CHOICES,
         default="",
@@ -343,12 +358,17 @@ class Avito(models.Model):
         upload_to=video_path, null=True, blank=True, verbose_name="Видео"
     )
 
+    user = models.CharField(
+        blank=True, null=True, max_length=250, verbose_name="Кто заносил/обновлял"
+    )
+
     class Meta:
         managed = False
         db_table = "avito"
         verbose_name = "Квартиру"
         verbose_name_plural = "Квартиры"
         # ordering = ("-rating", "price", "-god_postroyki")
+        # ordering = ("date_update", "date_add",  )
 
     @property
     def to_kapremont(self):
@@ -358,8 +378,8 @@ class Avito(models.Model):
         return None
 
     @property
-    def url_to_img(self):
-        return format_html("<img src='/static/flats/{}/main.jpg' height=200>", self.id)
+    def url_to_site(self):
+        return format_html("<a href={} target='_blank'>{}</a>", self.url, self.source_from)
 
     def __str__(self):
         return str(self.id)

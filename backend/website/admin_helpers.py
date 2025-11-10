@@ -33,14 +33,17 @@ def show_info33(instance):
 
 
 def show_item(background_color, title, value, is_copy=False):
+    extra_css = ""
+    if value and title not in ("andrey", "oksana"):
+        extra_css = "background-color: white; padding: 0px 5px;"
     rez = """<span style="
     display: inline-block; 
     background-color: {}; 
     color: black; 
     padding: 3px; 
     margin: 3px;">
-    {} {}
-    </span>""".format(background_color, title, value)
+    {} <span style="{}">{}</span>
+    </span>""".format(background_color, title, extra_css, value)
     if is_copy:
         rez = """<span style="
         display: inline-block; 
@@ -365,7 +368,7 @@ def show_infrastructure_info(instance):
     if d["to_magnit"]["instance"]:
         mags_sum.append(int(d["to_magnit"]["instance"]))
     if mags_sum:
-        mags_avg = int(sum(mags_sum) / len(mags_sum))
+        mags_avg = min(mags_sum)
 
     delivery_sum = []
     delivery_avg = ""
@@ -396,12 +399,16 @@ def show_infrastructure_info(instance):
                 and int(d[item]["instance"]) <= distance
             ):
                 deliverys_item = show_item("#00e600", "Доставка", delivery_avg)
+            else:
+                deliverys_item = show_item(colors["4"], "Доставка", delivery_avg)
             if (
                 d[item]["title"] in rating_infrastructure_mags
                 and d[item]["rez"]
                 and int(d[item]["instance"]) <= distance
             ):
                 mags_item = show_item("#00e600", "Сетевые", mags_avg)
+            else:
+                mags_item = show_item(colors["4"], "Сетевые", mags_avg)
     elif instance.record_status == "2":
         deliverys_item = show_item(colors["4"], "Доставка", delivery_avg)
         mags_item = show_item(colors["4"], "Сетевые", mags_avg)
@@ -484,8 +491,15 @@ def show_record_status(instance):
         bg_color = "#ffb3b3"
 
     review_results = show_item(bg_color, instance.get_review_results_display(), "")
+
+    user = ""
+    if instance.user is not None and instance.user == "andrey":
+        user = show_item("#e6e6e6", instance.user, "&#x1F7E0;")
+    if instance.user is not None and instance.user == "oksana":
+        user = show_item("#e6e6e6", instance.user, "&#x1F7E3;")
+
     return format_html(
-        "<div>{} {}</div>", format_html(status), format_html(review_results)
+        "<div>{} {} {}</div>", format_html(status), format_html(review_results), format_html(user)
     )
 
 
@@ -518,6 +532,8 @@ def show_general_info(instance):
         dop_info.append(show_item("#e6e6e6", "Площадь", instance.obshchaya_ploshchad))
     if instance.god_postroyki:
         dop_info.append(show_item("#e6e6e6", "Год постройки", instance.god_postroyki))
+    if instance.plita:
+        dop_info.append(show_item("#e6e6e6", "Плита", instance.get_plita_display()))
     return format_html("<div>{}</div>", format_html("".join(map(str, dop_info))))
 
 

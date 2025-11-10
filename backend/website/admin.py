@@ -20,6 +20,22 @@ from django.contrib.admin.models import LogEntry
 from django.db.models import Count
 from django.contrib.admin import DateFieldListFilter
 
+class OrderByDateFilter(admin.SimpleListFilter):
+    title = "Сортировка по дате"
+    parameter_name = "order_date"
+
+    def lookups(self, request, model_admin):
+        return [
+            ("date_add", "По дате добавлениия"),
+            ("date_update", "По дате обновления"),
+        ]
+
+    def queryset(self, request, queryset):
+        if self.value() == "date_add":
+            return queryset.all().order_by("-date_add")
+        if self.value() == "date_update":
+            return queryset.all().order_by("-date_update")
+
 
 class LinkTypeFilter(admin.SimpleListFilter):
     title = ""
@@ -54,7 +70,31 @@ class PriceFilter(admin.SimpleListFilter):
                 price__lte="5000000",
             )
 
+class UserFilter(admin.SimpleListFilter):
+    title = "Кто последний редактировал"
+    parameter_name = "user_filter"
+    # template = "admin/hidden_filter.html"
 
+    def lookups(self, request, model_admin):
+        return [
+            ("oksana", "Оксана"),
+            ("andrey", "Андрей"),
+            ("notdef", "Не указано"),
+        ]
+
+    def queryset(self, request, queryset):
+        if self.value() == "oksana":
+            return queryset.filter(
+                user__contains="oksana",
+            )
+        if self.value() == "andrey":
+            return queryset.filter(
+                user__contains="andrey",
+            )
+        if self.value() == "notdef":
+            return queryset.filter(
+                user__isnull=True,
+            )
 class WebsiteAdmin(admin.ModelAdmin):
     # class Media:
     #     js = ("js/admin_overrides.js",)
@@ -76,6 +116,7 @@ class WebsiteAdmin(admin.ModelAdmin):
         # "show_rating_flat",
         "show_rating_all",
         "is_active",
+        # "date_add",
         # "date_update",
         "show_img",
     ]
@@ -101,6 +142,10 @@ class WebsiteAdmin(admin.ModelAdmin):
         "rating_flat",
         "rating_all",
         "url",
+        "url_to_site",
+        "date_add",
+        "date_update",
+        "user"
     ]
     actions = [
         "action_export_csv",
@@ -118,13 +163,15 @@ class WebsiteAdmin(admin.ModelAdmin):
     }
     list_filter = [
         "status",
+        OrderByDateFilter,
         PriceFilter,
+        UserFilter,
         "record_status",
         "review_results",
         "district",
         "source_from",
         LinkTypeFilter,
-        ("date_update", DateFieldListFilter),
+        # ("date_update", DateFieldListFilter),
     ]
     search_fields = ["id", "address"]
 
@@ -133,14 +180,16 @@ class WebsiteAdmin(admin.ModelAdmin):
             "Общяя информация",
             {
                 "fields": [
-                    ("address",),
-                    ("url",),
                     (
                         "rating_infrastructure",
                         "rating_house",
                         "rating_flat",
                         "rating_all",
                     ),
+                    ("address", "url_to_site", ),
+                    ("date_add", "date_update", "user"),
+                    # ("url_to_site",),
+
                     (
                         "review_results",
                         "record_status",
@@ -237,6 +286,7 @@ class WebsiteAdmin(admin.ModelAdmin):
                     (
                         "district",
                         "tip_doma",
+                        "plita",
                     ),
                     (
                         "obshchaya_ploshchad",
@@ -292,11 +342,11 @@ class WebsiteAdmin(admin.ModelAdmin):
 
     # Удалить sction delete selected
     # Потом можно вернуть
-    def get_actions(self, request):
-        actions = super().get_actions(request)
-        if "delete_selected" in actions:
-            del actions["delete_selected"]
-        return actions
+    # def get_actions(self, request):
+    #     actions = super().get_actions(request)
+    #     if "delete_selected" in actions:
+    #         del actions["delete_selected"]
+    #     return actions
 
     def show_god_postroyki(self, instance):
         return instance.god_postroyki
@@ -426,6 +476,9 @@ class WebsiteAdmin(admin.ModelAdmin):
     #     js = ("js/admin_overrides.js",)
 
     def save_model(self, request, obj, form, change):
+        # user
+        obj.user = request.user.username
+        obj.date_update = datetime.datetime.now().strftime("%Y-%d-%m %H:%M")
         years = 5
         # kapremont
         if "kapremont_date" in request.POST and request.POST["kapremont_date"]:
