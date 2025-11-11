@@ -479,6 +479,15 @@ def show_general_info(instance):
         dop_info.append(show_item("#e6e6e6", "Год постройки", instance.god_postroyki))
     if instance.plita:
         dop_info.append(show_item("#e6e6e6", "Плита", instance.get_plita_display()))
+    
+    # kolichestvo_komnat
+    if instance.kolichestvo_komnat:
+        dop_info.append(show_item("#e6e6e6", "Комнат", instance.kolichestvo_komnat))   
+    if instance.zaplanirovan_snos:
+        if instance.zaplanirovan_snos == "1":
+            dop_info.append(show_item("#ffb3b3", "Снос", instance.get_zaplanirovan_snos_display()))
+        # else:
+        #     dop_info.append(show_item("#e6e6e6", "Снос", instance.get_zaplanirovan_snos_display()))
     return format_html("<div>{}</div>", format_html("".join(map(str, dop_info))))
 
 
@@ -730,9 +739,11 @@ def maps(instance):
     #  >Edit</a>""",
     #         instance.id,
     #     )
-
+    to_rieltor = int(instance.price) * 0.04
+    delta = 5000000 if int(instance.price) <= 5000000 else int(instance.price)
+    to_ostatok = 5500000 - delta - to_rieltor
     return format_html(
-        """<div>{} {} {} {} {} {}</div>""",
+        """<div>{} {} {} {} {} {} {} {}</div>""",
         format_html(show_item("#e6e6e6", to_hospital, "")),
         format_html(show_item("#e6e6e6", to_vokzal, "")),
         format_html(show_item("#e6e6e6", to_avito, "")),
@@ -740,6 +751,8 @@ def maps(instance):
         format_html(show_item("#e6e6e6", to_address_on_map, "")),
         format_html(show_item("#e6e6e6", to_address_on_map_google, "")),
         # format_html(show_item("#e6e6e6", to_address_on_map_google_all, "")),
+        format_html(show_item("#e6e6e6", "Риелтор", round(to_rieltor))),
+        format_html(show_item("#e6e6e6", "Остаток", round(to_ostatok))),
     )
 
 
@@ -758,7 +771,7 @@ def show_flat_image(instance):
     file_name = f"images/{instance.id}/main.jpg"
     if instance.file_img:
         file_name = instance.file_img
-    images_html = '<img src="/public/{}" width="150" height="150" style="padding-bottom: 10px; ">'.format(
+    images_html = '<img src="/public/{}" width="250"  style="padding-bottom: 10px; ">'.format(
         file_name
     )
     #

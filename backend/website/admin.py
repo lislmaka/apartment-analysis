@@ -287,6 +287,7 @@ class WebsiteAdmin(admin.ModelAdmin):
                         "district",
                         "tip_doma",
                         "plita",
+                        "zaplanirovan_snos",
                     ),
                     (
                         "obshchaya_ploshchad",

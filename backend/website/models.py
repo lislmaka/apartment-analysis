@@ -77,6 +77,11 @@ class Avito(models.Model):
         ("4", "Информация не найдена"),
     ]
 
+    SNOS_CHOICES = [
+        ("1", "Да"),
+        ("2", "Нет"),
+        ("3", "Неизвестно"),        
+    ]
     # id = models.BigAutoField(primary_key=True)
     # id = models.CharField(blank=True, null=True, verbose_name="ID объявления")
     id = models.BigAutoField(
@@ -351,6 +356,15 @@ class Avito(models.Model):
         choices=YESNO_RESULTS_CHOICES,
         default="1",
         verbose_name="Наличие мусоропровода в доме",
+    )
+
+    zaplanirovan_snos = models.CharField(
+        null=False,
+        blank=False,
+        max_length=50,
+        choices=SNOS_CHOICES,
+        default="3",
+        verbose_name="Запланирован снос",
     )
 
     file_img = models.FileField(
