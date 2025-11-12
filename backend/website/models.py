@@ -57,6 +57,12 @@ class Avito(models.Model):
         ("", "Не указано"),
     ]
 
+    SPOSOB_PRODAZHI_CHOICES = [
+        ("свободная", "Свободная"),
+        ("альтернативная", "Альтернативная"),
+        ("не указано", "Не указано"),
+    ]
+
     REVIEW_RESULTS_CHOICES = [
         ("1", "Осмотра не было"),
         ("2", "Осмотр был. Квартира подходит"),
@@ -107,6 +113,16 @@ class Avito(models.Model):
     description_minus = models.TextField(
         blank=True, null=True, default="", verbose_name="Недостатки"
     )
+
+    sposob_prodazhi = models.CharField(
+        # blank=True,
+        # null=True,
+        max_length=50,
+        choices=SPOSOB_PRODAZHI_CHOICES,
+        default="",
+        verbose_name="Способ продажи",
+    )
+
     plita = models.CharField(
         # blank=True,
         # null=True,
@@ -191,7 +207,7 @@ class Avito(models.Model):
     okna = models.CharField(blank=True, null=True, max_length=250, verbose_name="Окна")
     remont = models.TextField(blank=True, null=True)
     mebel = models.TextField(blank=True, null=True)
-    sposob_prodazhi = models.TextField(blank=True, null=True)
+    # sposob_prodazhi = models.TextField(blank=True, null=True)
     vid_sdelki = models.TextField(blank=True, null=True)
     # tip_doma = models.TextField(blank=True, null=True, verbose_name="Тип дома")
     tip_doma = models.CharField(

@@ -256,7 +256,9 @@ def show_house_info(instance):
                 d[item]["rez"] = show_item(colors["4"], d[item]["title"], "")
             else:
                 if d[item]["instance"]:
-                    d[item]["rez"] = show_item(colors[d[item]["instance"]], d[item]["title"], "")
+                    d[item]["rez"] = show_item(
+                        colors[d[item]["instance"]], d[item]["title"], ""
+                    )
                 else:
                     d[item]["rez"] = show_item(colors["1"], d[item]["title"], "")
 
@@ -373,18 +375,18 @@ def show_infrastructure_info(instance):
     if delivery_lst:
         delivery_min = min(delivery_lst)
 
-# 
+    #
     if instance.record_status == "1" or instance.record_status == "2":
-        if (delivery_min is not None and delivery_min <= distance):
+        if delivery_min is not None and delivery_min <= distance:
             deliverys_item = show_item(colors["2"], "Доставка", delivery_min)
-        elif (delivery_min is not None and delivery_min > distance):
+        elif delivery_min is not None and delivery_min > distance:
             deliverys_item = show_item(colors["3"], "Доставка", delivery_min)
         else:
             deliverys_item = show_item(colors["1"], "Доставка", "")
 
-        if (mags_min is not None and mags_min <= distance):
+        if mags_min is not None and mags_min <= distance:
             mags_item = show_item(colors["2"], "Сетевые", mags_min)
-        elif (mags_min is not None and mags_min > distance):
+        elif mags_min is not None and mags_min > distance:
             mags_item = show_item(colors["3"], "Сетевые", mags_min)
         else:
             mags_item = show_item(colors["1"], "Сетевые", "")
@@ -393,17 +395,19 @@ def show_infrastructure_info(instance):
     if instance.record_status == "2" and delivery_min is None:
         deliverys_item = show_item(colors["4"], "Доставка", "")
 
-
     for item in d:
-        if d[item]["instance"]: 
+        if d[item]["instance"]:
             if int(d[item]["instance"]) <= distance:
-                d[item]["rez"] = show_item("#b3b3ff", d[item]["title"], d[item]["instance"])
-        
+                d[item]["rez"] = show_item(
+                    "#b3b3ff", d[item]["title"], d[item]["instance"]
+                )
+
             else:
-                d[item]["rez"] = show_item("#ffe0b3", d[item]["title"], d[item]["instance"])
+                d[item]["rez"] = show_item(
+                    "#ffe0b3", d[item]["title"], d[item]["instance"]
+                )
         else:
             d[item]["rez"] = ""
-
 
     to_obj_main = """<div style="">{} {} {}</div>""".format(
         show_item("#cccccc", "Инфраструктура", ""),
@@ -441,7 +445,15 @@ def show_record_status(instance):
 
     dublicat_status = ""
     if instance.dublicat_status == "1":
-        dublicat_status = show_item("#ffb3b3", "Дубликат", instance.get_dublicat_status_display())
+        dublicat_status = show_item(
+            "#ffb3b3", "Дубликат", instance.get_dublicat_status_display()
+        )
+
+    #
+    bg_color = "#00e600"
+    if instance.sposob_prodazhi != "свободная":
+        bg_color = "#ffb3b3"
+    sposob_prodazhi = show_item(bg_color, "Продажа", instance.get_sposob_prodazhi_display())
 
     user = ""
     if instance.user is not None and instance.user == "andrey":
@@ -450,7 +462,12 @@ def show_record_status(instance):
         user = show_item("#e6e6e6", instance.user, "&#x1F7E3;")
 
     return format_html(
-        "<div>{} {} {} {}</div>", format_html(status), format_html(review_results), format_html(dublicat_status), format_html(user)
+        "<div>{} {} {} {} {}</div>",
+        format_html(status),
+        format_html(review_results),
+        format_html(dublicat_status),
+        format_html(sposob_prodazhi),
+        format_html(user),
     )
 
 
@@ -489,13 +506,15 @@ def show_general_info(instance):
         dop_info.append(show_item("#e6e6e6", "Год постройки", instance.god_postroyki))
     if instance.plita:
         dop_info.append(show_item("#e6e6e6", "Плита", instance.get_plita_display()))
-    
+
     # kolichestvo_komnat
     if instance.kolichestvo_komnat:
-        dop_info.append(show_item("#e6e6e6", "Комнат", instance.kolichestvo_komnat))   
+        dop_info.append(show_item("#e6e6e6", "Комнат", instance.kolichestvo_komnat))
     if instance.zaplanirovan_snos:
         if instance.zaplanirovan_snos == "1":
-            dop_info.append(show_item("#ffb3b3", "Снос", instance.get_zaplanirovan_snos_display()))
+            dop_info.append(
+                show_item("#ffb3b3", "Снос", instance.get_zaplanirovan_snos_display())
+            )
         # else:
         #     dop_info.append(show_item("#e6e6e6", "Снос", instance.get_zaplanirovan_snos_display()))
     return format_html("<div>{}</div>", format_html("".join(map(str, dop_info))))
@@ -740,7 +759,7 @@ def maps(instance):
         instance.address,
     )
 
-    # 
+    #
     address_all = Avito.objects.values_list("address", flat=True)
 
     address_one = Avito.objects.values_list("address", flat=True).filter(id=instance.id)
@@ -749,7 +768,7 @@ def maps(instance):
     address_street = address[-2]
     address_full_count = 0
     address_street_count = 0
-    
+
     for i in address_all:
         i = i.split(",")
         i_full = f"{i[-2]}, {i[-1]}"
@@ -758,19 +777,27 @@ def maps(instance):
             address_full_count += 1
         if address_street == i_street:
             address_street_count += 1
-    
+
     address_full_count_viev = ""
     address_full_count -= 1
     if address_full_count:
-        address_full_count_viev = show_item("#e6e6e6", f"<a href='/admin/website/avito/?q={address_full.strip()}'>Еще в этом доме</a>", address_full_count)
+        address_full_count_viev = show_item(
+            "#e6e6e6",
+            f"<a href='/admin/website/avito/?q={address_full.strip()}'>Еще в этом доме</a>",
+            address_full_count,
+        )
         # address_full_count_viev = show_item("#e6e6e6", "Еще в этом доме", address_full_count)
 
     address_street_count_viev = ""
     # address_street_count -= 1
     if address_street_count:
-        address_street_count_viev = show_item("#e6e6e6", f"<a href='/admin/website/avito/?q={address_street.strip()}'>На этой улице</a>", address_street_count)
+        address_street_count_viev = show_item(
+            "#e6e6e6",
+            f"<a href='/admin/website/avito/?q={address_street.strip()}'>На этой улице</a>",
+            address_street_count,
+        )
         # address_street_count_viev = show_item("#e6e6e6", "На этой улице", address_street_count)
-    # 
+    #
     to_rieltor = int(instance.price) * 0.04
     delta = 5000000 if int(instance.price) <= 5000000 else int(instance.price)
     to_ostatok = 5500000 - delta - to_rieltor
@@ -805,8 +832,10 @@ def show_flat_image(instance):
     file_name = f"images/{instance.id}/main.jpg"
     if instance.file_img:
         file_name = instance.file_img
-    images_html = '<img src="/public/{}" width="250"  style="padding-bottom: 10px; ">'.format(
-        file_name
+    images_html = (
+        '<img src="/public/{}" width="250"  style="padding-bottom: 10px; ">'.format(
+            file_name
+        )
     )
     #
     to_edit = format_html(

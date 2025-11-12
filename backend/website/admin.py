@@ -176,6 +176,7 @@ class WebsiteAdmin(admin.ModelAdmin):
         OrderByDateFilter,
         PriceFilter,
         UserFilter,
+        "sposob_prodazhi",
         "dublicat_status",
         "record_status",
         "review_results",
@@ -198,7 +199,7 @@ class WebsiteAdmin(admin.ModelAdmin):
                         "rating_all",
                     ),
                     ("address", "url_to_site", ),
-                    ("copy_from", "copy_from_done", "dublicat_status", "dublicat_id"),
+                    ("copy_from", "copy_from_done", "dublicat_status", "dublicat_id", "sposob_prodazhi"),
                     ("date_add", "date_update", "user"),
                     # ("url_to_site",),
 
