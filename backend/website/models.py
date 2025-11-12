@@ -377,7 +377,12 @@ class Avito(models.Model):
     user = models.CharField(
         blank=True, null=True, max_length=250, verbose_name="Кто заносил/обновлял"
     )
-
+    copy_from = models.CharField(
+        blank=True, null=True, max_length=250, verbose_name="Скопировать данные из другой квартиры"
+    )
+    copy_from_done = models.CharField(
+        blank=True, null=True, max_length=250, verbose_name="Данные скопированны из квартиры"
+    )
     class Meta:
         managed = False
         db_table = "avito"

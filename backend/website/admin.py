@@ -20,6 +20,8 @@ from django.contrib.admin.models import LogEntry
 from django.db.models import Count
 from django.contrib.admin import DateFieldListFilter
 
+from website.admin_save import copy_data_row_to_row2
+
 class OrderByDateFilter(admin.SimpleListFilter):
     title = "Сортировка по дате"
     parameter_name = "order_date"
@@ -145,7 +147,8 @@ class WebsiteAdmin(admin.ModelAdmin):
         "url_to_site",
         "date_add",
         "date_update",
-        "user"
+        "user",
+        "copy_from_done",
     ]
     actions = [
         "action_export_csv",
@@ -187,6 +190,7 @@ class WebsiteAdmin(admin.ModelAdmin):
                         "rating_all",
                     ),
                     ("address", "url_to_site", ),
+                    ("copy_from", "copy_from_done"),
                     ("date_add", "date_update", "user"),
                     # ("url_to_site",),
 
@@ -568,6 +572,10 @@ class WebsiteAdmin(admin.ModelAdmin):
         obj.rating_house = rating_house
         obj.rating_flat = rating_flat
         obj.rating_all = round(rating_infrastructure + rating_house + rating_flat, 2)
+
+        # copy data from other flat
+        if "copy_from" in request.POST and request.POST["copy_from"]:
+            copy_data_row_to_row2(request.POST["copy_from"], obj.id, obj)
 
         super().save_model(request, obj, form, change)
 

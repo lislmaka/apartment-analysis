@@ -86,7 +86,7 @@ def calculate_rating_infrastructure2(flat):
     else:
         rls.append(0)
 
-    print(rls)
+    # print(rls)
     # Есть ли рядом какой-то пункт выдачи товаров
     flag_delivery = False
     distance_delivery_lst = []
@@ -105,7 +105,7 @@ def calculate_rating_infrastructure2(flat):
     else:
         rls.append(0)
 
-    print(rls)
+    # print(rls)
 
     if flag_magazin and flag_delivery:
         # Учет не обяхательных гаправлений только при условии что все обязательные есть
@@ -139,5 +139,5 @@ def calculate_rating_infrastructure2(flat):
         else:
             rls.append(0)
 
-    print(f"rating1 = {round(sum(rls), 2)}")
+    # print(f"rating1 = {round(sum(rls), 2)}")
     return round(sum(rls), 2)
