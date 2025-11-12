@@ -82,6 +82,12 @@ class Avito(models.Model):
         ("2", "Нет"),
         ("3", "Неизвестно"),        
     ]
+
+    DUBLICAT_CHOICES = [
+        ("1", "Да"),
+        ("2", "Нет"),     
+    ]
+
     # id = models.BigAutoField(primary_key=True)
     # id = models.CharField(blank=True, null=True, verbose_name="ID объявления")
     id = models.BigAutoField(
@@ -365,6 +371,18 @@ class Avito(models.Model):
         choices=SNOS_CHOICES,
         default="3",
         verbose_name="Запланирован снос",
+    )
+
+    dublicat_status = models.CharField(
+        null=False,
+        blank=False,
+        max_length=50,
+        choices=DUBLICAT_CHOICES,
+        default="2",
+        verbose_name="Является дубликатом",
+    )
+    dublicat_id = models.CharField(
+        blank=True, null=True, max_length=250, verbose_name="Номер объявления дубликата"
     )
 
     file_img = models.FileField(

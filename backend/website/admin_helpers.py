@@ -439,6 +439,10 @@ def show_record_status(instance):
 
     review_results = show_item(bg_color, instance.get_review_results_display(), "")
 
+    dublicat_status = ""
+    if instance.dublicat_status == "1":
+        dublicat_status = show_item("#ffb3b3", "Дубликат", instance.get_dublicat_status_display())
+
     user = ""
     if instance.user is not None and instance.user == "andrey":
         user = show_item("#e6e6e6", instance.user, "&#x1F7E0;")
@@ -446,7 +450,7 @@ def show_record_status(instance):
         user = show_item("#e6e6e6", instance.user, "&#x1F7E3;")
 
     return format_html(
-        "<div>{} {} {}</div>", format_html(status), format_html(review_results), format_html(user)
+        "<div>{} {} {} {}</div>", format_html(status), format_html(review_results), format_html(dublicat_status), format_html(user)
     )
 
 
@@ -459,13 +463,15 @@ def show_general_info(instance):
         address_search = f"{address[-2]}, {address[-1]}"
         dop_info.append(
             # show_item("#e6e6e6", f"{address[-3]}, {address[-2]}, {address[-1]}", "")
-            show_item("#e6e6e6", f"<a href='/admin/website/avito/?q={address_search.strip()}'>{address_search}</a>", "", True)
+            # show_item("#e6e6e6", f"<a href='/admin/website/avito/?q={address_search.strip()}'>{address_search}</a>", "", True)
+            show_item("#e6e6e6", f"{address_search.strip()}", "", True)
         )
     if instance.source_from == "cian":
         address_search = f"{address[-2]}, {address[-1]}"
         dop_info.append(
             # show_item("#e6e6e6", f"{address[2]}, {address[0]}, {address[1]}", "")
-            show_item("#e6e6e6", f"<a href='/admin/website/avito/?q={address_search.strip()}'>{address_search}</a>", "", True)
+            # show_item("#e6e6e6", f"<a href='/admin/website/avito/?q={address_search.strip()}'>{address_search}</a>", "", True)
+            show_item("#e6e6e6", f"{address_search.strip()}", "", True)
         )
 
     if instance.district:
@@ -756,12 +762,14 @@ def maps(instance):
     address_full_count_viev = ""
     address_full_count -= 1
     if address_full_count:
-        address_full_count_viev = show_item("#e6e6e6", "Полное совпадение", address_full_count)
+        address_full_count_viev = show_item("#e6e6e6", f"<a href='/admin/website/avito/?q={address_full.strip()}'>Еще в этом доме</a>", address_full_count)
+        # address_full_count_viev = show_item("#e6e6e6", "Еще в этом доме", address_full_count)
 
     address_street_count_viev = ""
     # address_street_count -= 1
     if address_street_count:
-        address_street_count_viev = show_item("#e6e6e6", "На этой улице", address_street_count)
+        address_street_count_viev = show_item("#e6e6e6", f"<a href='/admin/website/avito/?q={address_street.strip()}'>На этой улице</a>", address_street_count)
+        # address_street_count_viev = show_item("#e6e6e6", "На этой улице", address_street_count)
     # 
     to_rieltor = int(instance.price) * 0.04
     delta = 5000000 if int(instance.price) <= 5000000 else int(instance.price)

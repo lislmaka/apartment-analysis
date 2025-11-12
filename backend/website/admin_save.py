@@ -66,6 +66,12 @@ def copy_data_row_to_row(id_from, id_to):
     connection.close()
 
 
+def dublicate(dublicate_id, flat):
+    if sqlite3_check_if_exist(dublicate_id):
+        flat.dublicat_status = "1"
+        flat.save()
+
+        
 def copy_data_row_to_row2(id_from, id_to, flat):
     list_fields = [
         "is_no_stupenki",

@@ -20,7 +20,7 @@ from django.contrib.admin.models import LogEntry
 from django.db.models import Count
 from django.contrib.admin import DateFieldListFilter
 
-from website.admin_save import copy_data_row_to_row2
+from website.admin_save import copy_data_row_to_row2, dublicate
 
 class OrderByDateFilter(admin.SimpleListFilter):
     title = "Сортировка по дате"
@@ -37,7 +37,6 @@ class OrderByDateFilter(admin.SimpleListFilter):
             return queryset.all().order_by("-date_add")
         if self.value() == "date_update":
             return queryset.all().order_by("-date_update")
-
 
 class LinkTypeFilter(admin.SimpleListFilter):
     title = ""
@@ -59,6 +58,7 @@ class PriceFilter(admin.SimpleListFilter):
         return [
             ("more5", "Больше 5 млн.р."),
             ("less5", "Мельше 5 млн.р."),
+            ("less52", "Мельше 5.200 млн.р."),
         ]
 
     def queryset(self, request, queryset):
@@ -71,6 +71,11 @@ class PriceFilter(admin.SimpleListFilter):
             return queryset.filter(
                 price__lte="5000000",
             )
+        if self.value() == "less52":
+            return queryset.filter(
+                price__lte="5200000",
+            )
+
 
 class UserFilter(admin.SimpleListFilter):
     title = "Кто последний редактировал"
@@ -149,6 +154,7 @@ class WebsiteAdmin(admin.ModelAdmin):
         "date_update",
         "user",
         "copy_from_done",
+        "dublicat_status",
     ]
     actions = [
         "action_export_csv",
@@ -170,6 +176,7 @@ class WebsiteAdmin(admin.ModelAdmin):
         OrderByDateFilter,
         PriceFilter,
         UserFilter,
+        "dublicat_status",
         "record_status",
         "review_results",
         "district",
@@ -191,7 +198,7 @@ class WebsiteAdmin(admin.ModelAdmin):
                         "rating_all",
                     ),
                     ("address", "url_to_site", ),
-                    ("copy_from", "copy_from_done"),
+                    ("copy_from", "copy_from_done", "dublicat_status", "dublicat_id"),
                     ("date_add", "date_update", "user"),
                     # ("url_to_site",),
 
@@ -583,6 +590,10 @@ class WebsiteAdmin(admin.ModelAdmin):
         # copy data from other flat
         if "copy_from" in request.POST and request.POST["copy_from"]:
             copy_data_row_to_row2(request.POST["copy_from"], obj.id, obj)
+
+        # dublicate
+        if "dublicat_id" in request.POST and request.POST["dublicat_id"]:
+            dublicate(request.POST["dublicat_id"], obj)
 
         super().save_model(request, obj, form, change)
 
