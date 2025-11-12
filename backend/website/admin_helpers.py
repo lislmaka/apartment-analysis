@@ -1,5 +1,7 @@
 from django.utils.html import format_html
 
+from .models import Avito
+
 
 colors = {
     "1": "#f2f2f2",
@@ -454,14 +456,16 @@ def show_general_info(instance):
 
     address = instance.address.split(",")
     if instance.source_from == "avito":
+        address_search = f"{address[-2]}, {address[-1]}"
         dop_info.append(
             # show_item("#e6e6e6", f"{address[-3]}, {address[-2]}, {address[-1]}", "")
-            show_item("#e6e6e6", f"{address[-2]}, {address[-1]}", "", True)
+            show_item("#e6e6e6", f"<a href='/admin/website/avito/?q={address_search.strip()}'>{address_search}</a>", "", True)
         )
     if instance.source_from == "cian":
+        address_search = f"{address[-2]}, {address[-1]}"
         dop_info.append(
             # show_item("#e6e6e6", f"{address[2]}, {address[0]}, {address[1]}", "")
-            show_item("#e6e6e6", f"{address[0]}, {address[1]}", "", True)
+            show_item("#e6e6e6", f"<a href='/admin/website/avito/?q={address_search.strip()}'>{address_search}</a>", "", True)
         )
 
     if instance.district:
@@ -730,20 +734,40 @@ def maps(instance):
         instance.address,
     )
 
-    #     to_edit = format_html(
-    #         """<a href="#"
-    #     onclick="window.open('http://localhost:1337/admin/website/avito/{}/change/',
-    #                          '_blank',
-    #                          'width=1100,height=700');
-    #               return false;"
-    #  >Edit</a>""",
-    #         instance.id,
-    #     )
+    # 
+    address_all = Avito.objects.values_list("address", flat=True)
+
+    address_one = Avito.objects.values_list("address", flat=True).filter(id=instance.id)
+    address = address_one[0].split(",")
+    address_full = f"{address[-2]}, {address[-1]}"
+    address_street = address[-2]
+    address_full_count = 0
+    address_street_count = 0
+    
+    for i in address_all:
+        i = i.split(",")
+        i_full = f"{i[-2]}, {i[-1]}"
+        i_street = i[-2]
+        if address_full == i_full:
+            address_full_count += 1
+        if address_street == i_street:
+            address_street_count += 1
+    
+    address_full_count_viev = ""
+    address_full_count -= 1
+    if address_full_count:
+        address_full_count_viev = show_item("#e6e6e6", "Полное совпадение", address_full_count)
+
+    address_street_count_viev = ""
+    # address_street_count -= 1
+    if address_street_count:
+        address_street_count_viev = show_item("#e6e6e6", "На этой улице", address_street_count)
+    # 
     to_rieltor = int(instance.price) * 0.04
     delta = 5000000 if int(instance.price) <= 5000000 else int(instance.price)
     to_ostatok = 5500000 - delta - to_rieltor
     return format_html(
-        """<div>{} {} {} {} {} {} {} {}</div>""",
+        """<div>{} {} {} {} {} {} {} {} {} {}</div>""",
         format_html(show_item("#e6e6e6", to_hospital, "")),
         format_html(show_item("#e6e6e6", to_vokzal, "")),
         format_html(show_item("#e6e6e6", to_avito, "")),
@@ -753,6 +777,8 @@ def maps(instance):
         # format_html(show_item("#e6e6e6", to_address_on_map_google_all, "")),
         format_html(show_item("#e6e6e6", "Риелтор", round(to_rieltor))),
         format_html(show_item("#e6e6e6", "Остаток", round(to_ostatok))),
+        format_html(address_full_count_viev),
+        format_html(address_street_count_viev),
     )
 
 

@@ -81,6 +81,10 @@ def action_make_inactive(queryset):
         flat.status = False
         flat.save()
 
+def action_make_all_data_inserted(queryset):
+    for flat in queryset:
+        flat.record_status = "2"
+        flat.save()
 
 def action_recalc_all_ratings(queryset):
     for flat in queryset:

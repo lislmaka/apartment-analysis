@@ -155,6 +155,7 @@ class WebsiteAdmin(admin.ModelAdmin):
         "action_export_info",
         "make_inactive",
         "make_active",
+        "make_all_data_inserted",
         "recalc_all_ratings",
     ]
 
@@ -470,6 +471,12 @@ class WebsiteAdmin(admin.ModelAdmin):
         aa.action_make_active(queryset)
 
     make_active.short_description = "Сделать активными"
+
+    # make_all_data_inserted
+    def make_all_data_inserted(self, request, queryset):
+        aa.action_make_all_data_inserted(queryset)
+
+    make_all_data_inserted.short_description = "Отметить что все данные внесены"
 
     # Make flat active
     def recalc_all_ratings(self, request, queryset):
