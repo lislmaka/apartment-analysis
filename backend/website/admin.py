@@ -1,5 +1,6 @@
 import csv
 import datetime
+import pytz 
 import json
 from django.contrib import admin
 from django.http import HttpResponse
@@ -498,7 +499,7 @@ class WebsiteAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
         # user
         obj.user = request.user.username
-        obj.date_update = datetime.datetime.now().strftime("%Y-%d-%m %H:%M")
+        obj.date_update = datetime.datetime.now(pytz.timezone('Europe/Moscow')).strftime("%Y-%m-%d %H:%M:%S")
         years = 5
         # kapremont
         if "kapremont_date" in request.POST and request.POST["kapremont_date"]:
