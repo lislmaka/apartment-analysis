@@ -719,14 +719,15 @@ def maps(instance):
         instance.address,
     )
 
+    address = instance.address.split(",")
     to_address_on_map_google = format_html(
         """<a href="#"
-    onclick="window.open('https://www.google.com/maps/place/{}',
+    onclick="window.open('https://www.google.com/maps/place/Брянск, {} {}',
                          '_blank',
                          'width=1100,height=700');
               return false;"
  >Google</a>""",
-        instance.address,
+        address[-2], address[-1]
     )
 
     #     to_address_on_map_google_all = format_html(
