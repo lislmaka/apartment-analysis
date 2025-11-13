@@ -8,6 +8,8 @@ class WebsiteSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "rating_all",
+            "rating_house",
+            "rating_flat",
             "price",
             # "title",
             # "url",

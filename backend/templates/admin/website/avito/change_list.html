@@ -6,12 +6,12 @@
 {{ block.super }}
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-<script data-status="{{ status }}">
+<script data-status="{{ status }}" data-ratings="{{ratings}}">
     google.charts.load("current", { packages: ["corechart"] });
     google.charts.setOnLoadCallback(drawChart);
     const data = document.currentScript.dataset;
     function drawChart() {
-        
+
 
         var jsonData = $.ajax({
             url: "http://localhost:1337/api/list/",
@@ -23,13 +23,33 @@
 
         var arrRatingHistogram = [['id', 'Value']];
 
-        var arrPriceLine = [['id', 'Value']];
+        // var arrPriceLineTitle = ['id', 'Rating1', 'Rating2', 'Rating3'];
+        // var arrPriceLineData = [];
         var arrPriceHistogram = [['id', 'Value']];
         for (const key in jsonData) {
             arrRatingHistogram.push([jsonData[key]["id"].toString(), parseFloat(jsonData[key]["rating_all"])]);
-            arrPriceLine.push([jsonData[key]["id"].toString(), parseInt(jsonData[key]["price"])]);
+            // arrPriceLineData.push([jsonData[key]["id"].toString(), parseFloat(jsonData[key]["rating_all"]), parseFloat(jsonData[key]["rating_house"]), parseFloat(jsonData[key]["rating_flat"])]);
+            // arrPriceLine.push([jsonData[key]["id"].toString(), parseInt(jsonData[key]["rating_house"])]);
+
             arrPriceHistogram.push([jsonData[key]["id"].toString(), parseInt(jsonData[key]["price"])]);
         }
+
+        // var arrPriceLine = [] 
+        // arrPriceLine.push(arrPriceLineTitle)
+
+        // arrPriceLineData = arrPriceLineData.sort(function (a, b) {
+        //     if (a[0] == b[0]) {
+        //         return a[1] - b[1];
+        //     }
+        //     return b[0] - a[0];
+        // });
+        // for (var i = 0; i < arrPriceLineData.length; i++) {
+        //     arrPriceLine.push(arrPriceLineData[i]) 
+        //     if (i >= 5) {
+        //         break
+        //     }
+        // }
+
 
         // Create our data table out of JSON data loaded from server.
         var dataRatingHistogram = new google.visualization.arrayToDataTable(arrRatingHistogram);
@@ -38,11 +58,11 @@
             legend: { position: 'none' },
         };
         // Create our data table out of JSON data loaded from server.
-        var dataPriceLine = new google.visualization.arrayToDataTable(arrPriceLine);
-        var optionsPriceLine = {
-            title: 'Цены на квартиры',
-            legend: { position: 'none' },
-        };
+        // var dataPriceLine = new google.visualization.arrayToDataTable(arrPriceLine);
+        // var optionsPriceLine = {
+        //     title: 'Цены на квартиры',
+        //     legend: { position: 'none' },
+        // };
 
         // Create our data table out of JSON data loaded from server.
         var dataPriceHistogram = new google.visualization.arrayToDataTable(arrPriceHistogram);
@@ -53,6 +73,13 @@
 
         // console.log("sdfsdfsdfsdf")
         // console.log(data["status"])
+        dataRatings = JSON.parse(data["ratings"])
+        var dataRatingsLine = new google.visualization.arrayToDataTable(dataRatings);
+        var optionsRatingsLine = {
+            title: 'Рейтинг',
+            legend: { position: 'none' },
+        };
+
         dataStatus = JSON.parse(data["status"])
 
         var dataStatusBar = new google.visualization.arrayToDataTable(dataStatus);
@@ -68,7 +95,7 @@
         chart.draw(dataPriceHistogram, optionsPriceHistogram);
 
         var chart = new google.visualization.LineChart(document.getElementById('chart_div2'));
-        chart.draw(dataPriceLine, optionsPriceLine);
+        chart.draw(dataRatingsLine, optionsRatingsLine);
 
         var chart = new google.visualization.BarChart(document.getElementById('chart_div4'));
         chart.draw(dataStatusBar, optionsDataStatusBar);
@@ -96,17 +123,17 @@
 <!-- begin filter -->
 <div style="text-align: center; padding: 20px;">
     {% if link_type == "1" %}
-        <a href="http://localhost:1337/admin/website/avito/?link_type=1" class="href">
-            <button style="cursor: pointer; text-align: center; padding: 5px 5px; background-color: #00e600;">
-                Базовый вид
-            </button>
-        </a>
+    <a href="http://localhost:1337/admin/website/avito/?link_type=1" class="href">
+        <button style="cursor: pointer; text-align: center; padding: 5px 5px; background-color: #00e600;">
+            Базовый вид
+        </button>
+    </a>
     {% else %}
-        <a href="http://localhost:1337/admin/website/avito/?link_type=1" class="href">
-            <button style="cursor: pointer; text-align: center; padding: 5px 5px; ">
-                Базовый вид
-            </button>
-        </a>
+    <a href="http://localhost:1337/admin/website/avito/?link_type=1" class="href">
+        <button style="cursor: pointer; text-align: center; padding: 5px 5px; ">
+            Базовый вид
+        </button>
+    </a>
     {% endif %}
 
 
@@ -123,35 +150,31 @@
         </button>
     </a>
     {% endif %}
-<!-- Google Map Begin -->
-    <a href="#"
-        onclick="window.open('https://www.google.com/maps/d/edit?mid=1CqEeIWmaLPMRzZq0li8Mv9vylvzM9YY&usp=sharing',
+    <!-- Google Map Begin -->
+    <a href="#" onclick="window.open('https://www.google.com/maps/d/edit?mid=1CqEeIWmaLPMRzZq0li8Mv9vylvzM9YY&usp=sharing',
                             '_blank',
                             'width=1100,height=700');
-                return false;"
-    >
-            <button style="text-align: center; padding: 5px 5px; cursor: pointer;">
-                Google Map
-            </button>
+                return false;">
+        <button style="text-align: center; padding: 5px 5px; cursor: pointer;">
+            Google Map
+        </button>
 
-        </a>
-<!-- Google Map End -->
-<!-- Last Begin -->
- {% for obj in history %}
+    </a>
+    <!-- Google Map End -->
+    <!-- Last Begin -->
+    {% for obj in history %}
     <!-- <a href="http://localhost:1337/admin/website/avito/{{obj.object_id}}/change/">{{obj.object_id}}</a> -->
 
-    <a href="#"
-        onclick="window.open('http://localhost:1337/admin/website/avito/{{obj}}/change/',
+    <a href="#" onclick="window.open('http://localhost:1337/admin/website/avito/{{obj}}/change/',
                             '_blank',
                             'width=1100,height=700');
-                return false;"
-    >
-            <button style="text-align: center; padding: 5px 5px; border: 0; background-color: white; cursor: pointer;">
-                {{obj}}
-            </button>
-        </a>
-{% endfor %}
-<!-- Last End -->
+                return false;">
+        <button style="text-align: center; padding: 5px 5px; border: 0; background-color: white; cursor: pointer;">
+            {{obj}}
+        </button>
+    </a>
+    {% endfor %}
+    <!-- Last End -->
 </div>
 
 <!-- end filter -->

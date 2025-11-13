@@ -321,6 +321,17 @@ class WebsiteAdmin(admin.ModelAdmin):
 
         # # Serialize and attach the chart data to the template context
         # as_json = json.dumps(list(serializer.data))
+        ratings_data = Avito.objects.values("id", "rating_all", "rating_house", "rating_flat").order_by("-rating_all", "price")[:10]
+        ratings_labels = ["id", "All", "House", "Flat"]
+        ratings_data_lst = []
+        ratings_data_lst.append(ratings_labels)
+        for row in ratings_data:
+            ratings_data_lst.append([str(row["id"]), row["rating_all"], row["rating_house"], row["rating_flat"]])
+            # ratings_data_lst.append(row)
+
+        print(ratings_data_lst)
+        ratings_data_json = json.dumps(ratings_data_lst)
+
         status = Avito.objects.values("record_status").annotate(
             count=Count("record_status")
         )
@@ -348,6 +359,7 @@ class WebsiteAdmin(admin.ModelAdmin):
             "link_type": link_type,
             "history": history_lst[:5],
             "status": status_data,
+            "ratings": ratings_data_json,
         }
 
         return super().changelist_view(

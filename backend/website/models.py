@@ -422,7 +422,7 @@ class Avito(models.Model):
         db_table = "avito"
         verbose_name = "Квартиру"
         verbose_name_plural = "Квартиры"
-        # ordering = ("-rating", "price", "-god_postroyki")
+        # ordering = ("-rating_all", "price")
         # ordering = ("date_update", "date_add",  )
 
     @property
