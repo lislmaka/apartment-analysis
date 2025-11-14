@@ -19,10 +19,12 @@ def show_info33(instance):
     descriptions = show_description(instance)
     general_info = show_general_info(instance)
     lmaps = maps(instance)
+    lmap2 = maps2(instance)
 
     # display: inline-block; background-color: #f2f2f2; font-size: 12px;
-    to_obj = """<div style="">{} {} {} {} {} {} {}</div>""".format(
+    to_obj = """<div style="">{} {} {} {} {} {} {} {}</div>""".format(
         lmaps,
+        lmap2,
         record_status,
         general_info,
         house_info,
@@ -455,19 +457,19 @@ def show_record_status(instance):
         bg_color = "#ffb3b3"
     sposob_prodazhi = show_item(bg_color, "Продажа", instance.get_sposob_prodazhi_display())
 
-    user = ""
-    if instance.user is not None and instance.user == "andrey":
-        user = show_item("#e6e6e6", instance.user, "&#x1F7E0;")
-    if instance.user is not None and instance.user == "oksana":
-        user = show_item("#e6e6e6", instance.user, "&#x1F7E3;")
+    # user = ""
+    # if instance.user is not None and instance.user == "andrey":
+    #     user = show_item("#e6e6e6", instance.user, "&#x1F7E0;")
+    # if instance.user is not None and instance.user == "oksana":
+    #     user = show_item("#e6e6e6", instance.user, "&#x1F7E3;")
 
     return format_html(
-        "<div>{} {} {} {} {}</div>",
+        "<div>{} {} {} {}</div>",
         format_html(status),
         format_html(review_results),
         format_html(dublicat_status),
         format_html(sposob_prodazhi),
-        format_html(user),
+        # format_html(user),
     )
 
 
@@ -730,15 +732,6 @@ def maps(instance):
         address[-2], address[-1]
     )
 
-    #     to_address_on_map_google_all = format_html(
-    #         """<a href="#"
-    #     onclick="window.open('https://www.google.com/maps/d/edit?mid=1CqEeIWmaLPMRzZq0li8Mv9vylvzM9YY&usp=sharing',
-    #                          '_blank',
-    #                          'width=1100,height=700');
-    #               return false;"
-    #  >GoogleAll</a>"""
-    #     )
-
     to_avito = format_html(
         """<a href="#"
     onclick="window.open('{}',
@@ -784,7 +777,7 @@ def maps(instance):
     if address_full_count:
         address_full_count_viev = show_item(
             "#e6e6e6",
-            f"<a href='/admin/website/avito/?q={address_full.strip()}'>Еще в этом доме</a>",
+            f"<a href='/admin/website/avito/?q={address_full.strip()}'>В доме</a>",
             address_full_count,
         )
         # address_full_count_viev = show_item("#e6e6e6", "Еще в этом доме", address_full_count)
@@ -794,7 +787,7 @@ def maps(instance):
     if address_street_count:
         address_street_count_viev = show_item(
             "#e6e6e6",
-            f"<a href='/admin/website/avito/?q={address_street.strip()}'>На этой улице</a>",
+            f"<a href='/admin/website/avito/?q={address_street.strip()}'>На улице</a>",
             address_street_count,
         )
         # address_street_count_viev = show_item("#e6e6e6", "На этой улице", address_street_count)
@@ -803,7 +796,7 @@ def maps(instance):
     delta = 5000000 if int(instance.price) <= 5000000 else int(instance.price)
     to_ostatok = 5500000 - delta - to_rieltor
     return format_html(
-        """<div>{} {} {} {} {} {} {} {} {} {}</div>""",
+        """<div>{} {} {} {} {} {} {} {} </div>""",
         format_html(show_item("#e6e6e6", to_hospital, "")),
         format_html(show_item("#e6e6e6", to_vokzal, "")),
         format_html(show_item("#e6e6e6", to_avito, "")),
@@ -811,20 +804,41 @@ def maps(instance):
         format_html(show_item("#e6e6e6", to_address_on_map, "")),
         format_html(show_item("#e6e6e6", to_address_on_map_google, "")),
         # format_html(show_item("#e6e6e6", to_address_on_map_google_all, "")),
-        format_html(show_item("#e6e6e6", "Риелтор", round(to_rieltor))),
-        format_html(show_item("#e6e6e6", "Остаток", round(to_ostatok))),
+        # format_html(show_item("#e6e6e6", "Риелтор", round(to_rieltor))),
+        # format_html(show_item("#e6e6e6", "Остаток", round(to_ostatok))),
         format_html(address_full_count_viev),
         format_html(address_street_count_viev),
     )
 
+# 
+def maps2(instance):
+
+    to_rieltor = int(instance.price) * 0.04
+    delta = 5000000 if int(instance.price) <= 5000000 else int(instance.price)
+    to_ostatok = 5500000 - delta - to_rieltor
+
+    user = ""
+    if instance.user is not None and instance.user == "andrey":
+        user = show_item("#e6e6e6", instance.user, "&#x1F7E0;")
+    if instance.user is not None and instance.user == "oksana":
+        user = show_item("#e6e6e6", instance.user, "&#x1F7E3;")
+
+    return format_html(
+        """<div>{} {} {}</div>""",
+        format_html(user),
+        format_html(show_item("#e6e6e6", "Риелтор", round(to_rieltor))),
+        format_html(show_item("#e6e6e6", "Остаток", round(to_ostatok))),
+    )
+# 
 
 def show_flat_image(instance):
+
     bg_color = ""
-    if instance.review_results == "1":
+    if instance.review_results == "1" and instance.status:
         bg_color = "background-color: #e6e6e6;"
-    elif instance.review_results == "2":
+    elif instance.review_results == "2" and instance.status:
         bg_color = "background-color: #00e600;"
-    elif instance.review_results == "3":
+    elif instance.review_results == "3" or not instance.status:
         bg_color = "background-color: #ffb3b3;"
     images_html_begin = '<div style="display: flex; justify-content: center; align-items: center; border-radius: 5px; {}">'.format(
         bg_color
@@ -834,7 +848,7 @@ def show_flat_image(instance):
     if instance.file_img:
         file_name = instance.file_img
     images_html = (
-        '<img src="/public/{}" width="250"  style="padding-bottom: 10px; ">'.format(
+        '<img src="/public/{}" width="250"  style="padding: 10px; ">'.format(
             file_name
         )
     )
@@ -849,15 +863,6 @@ def show_flat_image(instance):
         instance.id,
         format_html(images_html),
     )
-    #     video = format_html(
-    #       """<div><a href="#"
-    #     onclick="window.open('http://localhost:1337/static/video/video.html',
-    #                         '_blank',
-    #                         'width=500,height=300');
-    #             return false;"
-    # >{}</a></div>""",
-    #         "Видео",
-    #     )
     video = ""
     if instance.file_video:
         video = format_html(

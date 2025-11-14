@@ -9,6 +9,7 @@ from website.models import Avito
 from django.db import models
 from django.forms import TextInput, Textarea
 from django.utils.html import format_html
+from django.db.models.functions import RowNumber
 
 import website.admin_helpers as myutils
 import website.admin_actions as aa
@@ -18,7 +19,7 @@ from website.admin_ratings import (
     calculate_rating_house,
 )
 from django.contrib.admin.models import LogEntry
-from django.db.models import Count
+from django.db.models import Count, Window, F, Avg
 from django.contrib.admin import DateFieldListFilter
 
 from website.admin_save import copy_data_row_to_row2, dublicate
@@ -123,7 +124,10 @@ class WebsiteAdmin(admin.ModelAdmin):
         # "show_rating_house",
         # "show_rating_flat",
         "show_rating_all",
-        "is_active",
+        "show_rating_house",
+        "show_rating_flat",
+        "show_rating_infrastructure",
+        # "is_active",
         # "date_add",
         # "date_update",
         "show_img",
@@ -329,7 +333,7 @@ class WebsiteAdmin(admin.ModelAdmin):
             ratings_data_lst.append([str(row["id"]), row["rating_all"], row["rating_house"], row["rating_flat"]])
             # ratings_data_lst.append(row)
 
-        print(ratings_data_lst)
+        # print(ratings_data_lst)
         ratings_data_json = json.dumps(ratings_data_lst)
 
         status = Avito.objects.values("record_status").annotate(
@@ -354,6 +358,7 @@ class WebsiteAdmin(admin.ModelAdmin):
         for row in history:
             if row.object_id not in history_lst:
                 history_lst.append(row.object_id)
+
 
         extra_context = extra_context or {
             "link_type": link_type,
@@ -381,28 +386,28 @@ class WebsiteAdmin(admin.ModelAdmin):
     show_god_postroyki.short_description = "Год"
     show_god_postroyki.admin_order_field = "god_postroyki"
 
-    # def show_rating_infrastructure(self, instance):
-    #     return instance.rating_infrastructure
+    def show_rating_infrastructure(self, instance):
+        return instance.rating_infrastructure
 
-    # show_rating_infrastructure.short_description = "R(И)"
-    # show_rating_infrastructure.admin_order_field = "rating_infrastructure"
+    show_rating_infrastructure.short_description = "R(И)"
+    show_rating_infrastructure.admin_order_field = "rating_infrastructure"
 
-    # def show_rating_house(self, instance):
-    #     return instance.rating_house
+    def show_rating_house(self, instance):
+        return instance.rating_house
 
-    # show_rating_house.short_description = "R(Д)"
-    # show_rating_house.admin_order_field = "rating_house"
+    show_rating_house.short_description = "R(Д)"
+    show_rating_house.admin_order_field = "rating_house"
 
-    # def show_rating_flat(self, instance):
-    #     return instance.rating_flat
+    def show_rating_flat(self, instance):
+        return instance.rating_flat
 
-    # show_rating_flat.short_description = "R(К)"
-    # show_rating_flat.admin_order_field = "rating_flat"
+    show_rating_flat.short_description = "R(К)"
+    show_rating_flat.admin_order_field = "rating_flat"
 
     def show_rating_all(self, instance):
         return instance.rating_all
 
-    show_rating_all.short_description = "Рейтинг"
+    show_rating_all.short_description = "R(A)"
     show_rating_all.admin_order_field = "rating_all"
 
     def show_url(self, instance):
@@ -434,7 +439,7 @@ class WebsiteAdmin(admin.ModelAdmin):
     show_obshchaya_ploshchad.short_description = "S"
     show_obshchaya_ploshchad.admin_order_field = "obshchaya_ploshchad"
 
-    #
+    
     def is_active(self, instance):
         return instance.status == 1
 
