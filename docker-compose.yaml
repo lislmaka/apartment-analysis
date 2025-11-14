@@ -88,6 +88,26 @@ services:
       - ./settings/env/.env.backend
     restart: unless-stopped
 
+  #
+  # jupyterlab
+  service.jupyter:
+    build:
+      context: .
+      dockerfile: ./settings/docker/Dockerfile.jupyterlab
+    # image: jupyter/datascience-notebook:latest
+    # container_name: jupyter
+    ports:
+      - 8888:8888
+    volumes:
+      - ./jupyterlab/files:/home/jovyan/files
+      - ./backend/db:/home/jovyan/db
+    restart: unless-stopped
+    networks:
+    - internal-net
+    environment:
+      JUPYTER_ENABLE_LAB: "yes"
+      JUPYTER_TOKEN: "docker"
+
   # ----------------------------------------------------------------------------
   # adminer
   # ----------------------------------------------------------------------------
