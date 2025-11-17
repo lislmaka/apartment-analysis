@@ -7,6 +7,7 @@ class WebsiteSerializer(serializers.ModelSerializer):
         model = Avito
         fields = [
             "id",
+            "title",
             "rating_all",
             "rating_house",
             "rating_flat",

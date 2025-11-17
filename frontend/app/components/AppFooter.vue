@@ -1,3 +1,3 @@
 <template>
-    <span></span>
+    <div>Copyright (2025)</div>
 </template>
