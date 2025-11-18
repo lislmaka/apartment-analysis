@@ -14,11 +14,11 @@ const countProjects = ref("0")
 
 const filteredProjects = computed(() => {
     if (!message.value) {
-        countProjects.value = data.value.length
-        return data.value;
+        countProjects.value = data.value["results"].length
+        return data.value["results"];
     }
     const lowerCaseSearchText = message.value.toLowerCase();
-    const d = data.value.filter(user => user.id.toString().includes(message.value));
+    const d = data.value["results"].filter(user => user.id.toString().includes(message.value));
     countProjects.value = d.length
     return d
 })
