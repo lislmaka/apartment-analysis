@@ -14,8 +14,11 @@ services:
     build:
       context: .
       dockerfile: ./settings/docker/Dockerfile.nginx
+    expose:
+      - 5173
     ports:
       - 1337:80
+      - 5173:80
     depends_on:
       - service.frontend
     volumes:
@@ -33,11 +36,12 @@ services:
       context: .
       dockerfile: ./settings/docker/Dockerfile.frontend
     command: "npm run dev -- -o"
-    # expose:
-    #   - 3000:3000
-    ports:
-      - 24678:24678
-      - 3001:3001
+    expose:
+      - 5173
+    # ports:
+      # - 24678:24678
+      # - 3000:3000
+      # - 3001:3001
       # - 3000:3000
       # - 1337:1337
       # - 5173:5173

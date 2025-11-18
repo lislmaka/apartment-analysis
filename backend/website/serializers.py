@@ -12,14 +12,12 @@ class WebsiteSerializer(serializers.ModelSerializer):
             "rating_house",
             "rating_flat",
             "price",
-            # "title",
-            # "url",
-            # "address",
-            # "price",
-            # "kolichestvo_komnat",
-            # "obshchaya_ploshchad",
-            # "god_postroyki",
-            # "kapremont_date",
-            # "etazh_val",
-            # "etazh_count"
+            "url",
+            "address",
+            "kolichestvo_komnat",
+            "obshchaya_ploshchad",
+            "god_postroyki",
+            "kapremont_date",
+            "etazh_val",
+            "etazh_count"
         ]
