@@ -10,8 +10,8 @@ class LargeResultsSetPagination(PageNumberPagination):
     # Удрать пагинация при выводе графиков
     # Для построения графиков нужны все данные
     page_size = None
-    page_size_query_param = 'page_size'
-    max_page_size = 10000
+    # page_size_query_param = 'page_size'
+    # max_page_size = 10000
 
 
 class WebsiteListAll(generics.ListCreateAPIView):

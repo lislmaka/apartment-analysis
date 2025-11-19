@@ -3,14 +3,18 @@ import AppLeftSide from '~/components/AppLeftSide.vue';
 import AppRightSide from '~/components/AppRightSide.vue';
 
 const runtimeConfig = useRuntimeConfig()
-
-// const { data, pending, error } = await useFetch('http://service.backend:8000/api/list/')
-// const { data, pending, error } = await useFetch('http://localhost:1337/api/list/')
-let url = "baseURL" in runtimeConfig ? runtimeConfig.baseURL  : 'http://localhost:1337/api/list/'
-
-const { data, pending, error } = await useFetch(url)
 const message = ref("")
+const paginationPageNumber = ref(1)
 const countProjects = ref("0")
+
+let url = "baseURL" in runtimeConfig ? runtimeConfig.baseURL : 'http://localhost:1337/api/list/'
+
+const { data, pending, error } = await useFetch(url, {
+    query: {
+        page: paginationPageNumber,
+    },
+})
+
 
 const filteredProjects = computed(() => {
     if (!message.value) {
@@ -26,18 +30,25 @@ const filteredProjects = computed(() => {
 function filtersEvents(val) {
     alert(val)
 }
+function getPaginationPageNumber(page) {
+    paginationPageNumber.value = page
+}
 
 </script>
 
 <template>
     <div class="">
         <div>
-            <AppPagination :count="countProjects"/>
+            {{ paginationPageNumber }}
+            <AppPagination :count="countProjects" @getpaginationPageNumber="getPaginationPageNumber" />
+            <template>
+                <UPagination v-model:page="page" :total="100" />
+            </template>
         </div>
         <div class="row">
             <div class="col-9">
                 <div v-if="data">
-                    <AppFlatBlock v-for="item in filteredProjects" :key="item.id" :item="item"/>
+                    <AppFlatBlock v-for="item in filteredProjects" :key="item.id" :item="item" />
                 </div>
                 <p v-if="pending">Loading...</p>
                 <p v-if="error">{{ error.message }}</p>
