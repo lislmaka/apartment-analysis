@@ -14,7 +14,7 @@ const countProjects = ref("0")
 
 const filteredProjects = computed(() => {
     if (!message.value) {
-        countProjects.value = data.value["results"].length
+        countProjects.value = data.value["count"]
         return data.value["results"];
     }
     const lowerCaseSearchText = message.value.toLowerCase();
@@ -31,6 +31,9 @@ function filtersEvents(val) {
 
 <template>
     <div class="">
+        <div>
+            <AppPagination :count="countProjects"/>
+        </div>
         <div class="row">
             <div class="col-9">
                 <div v-if="data">
