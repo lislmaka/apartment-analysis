@@ -4,14 +4,6 @@ export default defineNuxtConfig({
     host: '0.0.0.0', // Принимать подключения со всех интерфейсов
     // port: 3000
   },
-  // runtimeConfig: {
-  //   app: {
-  //     url: 'http://frontend-service:3000', // Docker service name
-  //   },
-  // },
-  // app: {
-  //   baseURL: '/',
-  // },
   runtimeConfig: {
     baseURL: 'http://service.backend:8000/api/list/',
     public: {
@@ -22,11 +14,13 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   modules: [
     // '@nuxtjs/tailwindcss',
+    '@nuxt/ui',
   ],
   css: [
-    'bootstrap/dist/css/bootstrap.min.css',
+    // 'bootstrap/dist/css/bootstrap.min.css',
+    '~/assets/css/main.css',
   ],
   plugins: [
-    { src: 'plugins/bootstrap.js', mode: 'client' }, // load the plugin on client-side only
+    // { src: 'plugins/bootstrap.js', mode: 'client' }, 
   ],
 })

@@ -20,8 +20,13 @@ function isChecked(event) {
 
 </script>
 <template>
-
-    <div class="card">
+    <div class="flex flex-col rounded-xl bg-white outline outline-black/5  dark:bg-slate-800 dark:shadow-none dark:-outline-offset-1 dark:outline-white/10">
+        <div class="block bg-gray-50 p-3 text-xl font-medium text-black dark:text-white dark:bg-slate-800 dark:shadow-none dark:-outline-offset-1 dark:outline-white/10">Фильтры</div>
+        <div class="block p-3">
+            <a href="#" @click="$emit('filters', 'pizza1')">Тестовый фильтр</a>
+        </div>
+    </div>
+    <!-- <div class="card">
         <div class="card-header">
             Фильтры
         </div>
@@ -42,5 +47,5 @@ function isChecked(event) {
             <li class="list-group-item">A third item</li>
         </ul>
         <button @click="$emit('filters', 'pizza1')" type="button" class="btn btn-primary">Primary</button>
-    </div>
+    </div> -->
 </template>

@@ -11,6 +11,7 @@ class WebsiteSerializer(serializers.ModelSerializer):
             "rating_all",
             "rating_house",
             "rating_flat",
+            "rating_infrastructure",
             "price",
             "url",
             "address",

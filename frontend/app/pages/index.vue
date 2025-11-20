@@ -5,14 +5,15 @@ import AppRightSide from '~/components/AppRightSide.vue';
 const runtimeConfig = useRuntimeConfig()
 const message = ref("")
 const paginationPageNumber = ref(1)
-const countProjects = ref("0")
+const countProjects = ref(0)
 
 let url = "baseURL" in runtimeConfig ? runtimeConfig.baseURL : 'http://localhost:1337/api/list/'
 
-const { data, pending, error } = await useFetch(url, {
+const { data, status, error } = await useFetch(url, {
     query: {
         page: paginationPageNumber,
     },
+    // lazy: true,
 })
 
 
@@ -24,6 +25,7 @@ const filteredProjects = computed(() => {
     const lowerCaseSearchText = message.value.toLowerCase();
     const d = data.value["results"].filter(user => user.id.toString().includes(message.value));
     countProjects.value = d.length
+    console.log("--->>>", countProjects.value)
     return d
 })
 
@@ -37,18 +39,30 @@ function getPaginationPageNumber(page) {
 </script>
 
 <template>
-    <div class="">
+    <div class="block my-3">
+        <UPagination v-model:page="paginationPageNumber" :total="countProjects" />
+    </div>
+    <div class="grid grid-cols-12 gap-4">
+
+        <div v-if="data" class="col-span-9">
+            <AppFlatBlock2 v-for="item in filteredProjects" :key="item.id" :item="item" />
+        </div>
+        <div class="col-span-3">
+            <AppRightSide @filters="filtersEvents" />
+        </div>
+    </div>
+    <!-- <p v-if="status === 'pending'">Loading...</p>
+    <p v-if="error">{{ error.message }}</p> -->
+    <!-- <div class="">
         <div>
             {{ paginationPageNumber }}
             <AppPagination :count="countProjects" @getpaginationPageNumber="getPaginationPageNumber" />
-            <template>
-                <UPagination v-model:page="page" :total="100" />
-            </template>
+
         </div>
         <div class="row">
             <div class="col-9">
                 <div v-if="data">
-                    <AppFlatBlock v-for="item in filteredProjects" :key="item.id" :item="item" />
+                    <AppFlatBlock2 v-for="item in filteredProjects" :key="item.id" :item="item" />
                 </div>
                 <p v-if="pending">Loading...</p>
                 <p v-if="error">{{ error.message }}</p>
@@ -67,4 +81,5 @@ function getPaginationPageNumber(page) {
             </div>
         </div>
     </div>
+ -->
 </template>

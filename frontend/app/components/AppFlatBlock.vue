@@ -14,15 +14,27 @@ const fields = {
 const kapremontColor = computed(() => {
    let cls = ""
    // console.log(props["item"]["kapremont_date"])
-    if ((props["item"]["kapremont_date"] - 2025) <= 5) {
+   if ((props["item"]["kapremont_date"] - 2025) <= 5) {
       cls = "bg-danger-subtle"
-    }
+   }
    return cls
 })
 
 </script>
 
+
 <template>
+   <UPageCard 
+      :title=item.title
+      :description=item.address
+      orientation="horizontal">
+
+      <img v-bind:src="'/public/images/' + item['id'] + '/main.jpg'" class="w-50" alt="...">
+      <!-- <img src="/tailwindcss-v4.svg" alt="Tailwind CSS" class="w-full" /> -->
+   </UPageCard>
+</template>
+
+<!-- <template>
    <div class="card mb-3">
       <div class="row g-0">
          <div class="col-md-9">
@@ -73,4 +85,4 @@ const kapremontColor = computed(() => {
          </div>
       </div>
    </div>
-</template>
+</template> -->
