@@ -21,6 +21,9 @@ const fields_ratings = {
     "rating_infrastructure": "Рейтинг инфраструктыры",
 }
 
+const fields_house = {
+   "kapremont_diff": "До капремонта",
+}
 // const chackIsUnsutable = computed(() => {
 //     if (index === "kapremont_date" && (props["item"]["kapremont_date"] - 2025) <= 5) {
 //         cls = "bg-black"
@@ -82,6 +85,17 @@ const classObject = reactive({
                     </div>
                 </div>
             </div>
+            <!-- House -->
+             <div class="flex flex-wrap gap-1">
+                <div class="flat_items_label">Дом</div>
+                <div class="flat_items_wrapper" v-for="(value, index) in fields_house">
+                    <div class="flat_items_text">{{ value }}</div>
+                    <div class="flat_items_value">
+                        {{ item[index] }}
+                    </div>
+                </div>
+            </div>
+
         </div>
         <div class="">
             <div v-if="isUnsuitable" class="block"></div>

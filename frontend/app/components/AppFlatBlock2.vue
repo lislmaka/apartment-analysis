@@ -14,13 +14,14 @@ const fields_general = {
     "etazh_count": "Этажей",
 }
 const fields_ratings = {
-    "rating_all": "Суммарный рейтинг",
-    "rating_house": "Рейтинг дома",
-    "rating_flat": "Рейтинг квартиры",
-    "rating_flat": "Рейтинг квартиры",
-    "rating_infrastructure": "Рейтинг инфраструктыры",
+    "rating_all": "Суммарный",
+    "rating_house": "Дом",
+    "rating_flat": "Квартира",
+    "rating_infrastructure": "Инфраструктура",
 }
-
+const fields_house = {
+   "kapremont_diff": "До капремонта",
+}
 // const chackIsUnsutable = computed(() => {
 //     if (index === "kapremont_date" && (props["item"]["kapremont_date"] - 2025) <= 5) {
 //         cls = "bg-black"
@@ -50,7 +51,7 @@ function priceColor(index) {
 
 
 const classObject = reactive({
-  'bg-black': true
+    'bg-black': true
 })
 </script>
 
@@ -58,7 +59,7 @@ const classObject = reactive({
 <template>
     <div class="grid grid-cols-12 gap-1 border border-gray-100 p-3 mb-5 rounded">
 
-        <div class="col-span-9">
+        <div class="col-span-9 flex flex-col gap-1">
             <div class="text-xl font-medium text-black dark:text-white">{{ item.title }}</div>
             <p class="text-gray-500 dark:text-gray-400">{{ item.address }}</p>
             <!-- Ratings -->
@@ -74,7 +75,18 @@ const classObject = reactive({
             <!-- General -->
             <div class="flex flex-wrap gap-1">
                 <div class="flat_items_label">Общая информация</div>
-                <div class="flat_items_wrapper" :class="kapremontColor(index), priceColor(index)" v-for="(value, index) in fields_general">
+                <div class="flat_items_wrapper" :class="kapremontColor(index), priceColor(index)"
+                    v-for="(value, index) in fields_general">
+                    <div class="flat_items_text">{{ value }}</div>
+                    <div class="flat_items_value">
+                        {{ item[index] }}
+                    </div>
+                </div>
+            </div>
+            <!-- House -->
+            <div class="flex flex-wrap gap-1">
+                <div class="flat_items_label">Дом</div>
+                <div class="flat_items_wrapper" v-for="(value, index) in fields_house">
                     <div class="flat_items_text">{{ value }}</div>
                     <div class="flat_items_value">
                         {{ item[index] }}
@@ -84,9 +96,10 @@ const classObject = reactive({
         </div>
         <div class="col-span-3 justify-items-center">
             <div v-if="isUnsuitable" class="block bg-red-300 p-1 m-1 px-3 rounded">Квартира не подходит</div>
-            <img class="size-52 shrink-0 p-3 rounded-2xl mb-1" :class="image_danger_class" v-bind:src="'/public/images/' + item['id'] + '/main.jpg'" />
+            <img class="size-52 shrink-0 p-3 rounded-2xl mb-1" :class="image_danger_class"
+                v-bind:src="'/public/images/' + item['id'] + '/main.jpg'" />
         </div>
-        
+
     </div>
 </template>
 

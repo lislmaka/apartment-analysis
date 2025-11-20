@@ -20,5 +20,6 @@ class WebsiteSerializer(serializers.ModelSerializer):
             "god_postroyki",
             "kapremont_date",
             "etazh_val",
-            "etazh_count"
+            "etazh_count",
+            "kapremont_diff",
         ]
