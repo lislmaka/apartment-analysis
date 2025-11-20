@@ -1,5 +1,7 @@
 <script setup>
 const props = defineProps(['item'])
+let image_danger_class = ref("bg-gray-100")
+let isUnsuitable = ref(false)
 
 const fields_general = {
     "price": "Цена",
@@ -18,18 +20,20 @@ const fields_ratings = {
     "rating_flat": "Рейтинг квартиры",
     "rating_infrastructure": "Рейтинг инфраструктыры",
 }
-// const kapremontColor = computed((index) => {
-//     let cls = ""
-//     // console.log(props["item"]["kapremont_date"])
+
+// const chackIsUnsutable = computed(() => {
 //     if (index === "kapremont_date" && (props["item"]["kapremont_date"] - 2025) <= 5) {
 //         cls = "bg-black"
 //     }
 //     return cls
 // })
+
 function kapremontColor(index) {
     let cls = ""
     if (index === "kapremont_date" && (props["item"]["kapremont_date"] - 2025) <= 5) {
         cls = "bg-red-100"
+        image_danger_class = "bg-red-200"
+        isUnsuitable = true
     }
     return cls
 }
@@ -38,6 +42,8 @@ function priceColor(index) {
     let cls = ""
     if (index === "price" && props["item"]["price"] > 5000000) {
         cls = "bg-red-100"
+        image_danger_class = "bg-red-200"
+        isUnsuitable = true
     }
     return cls
 }
@@ -50,10 +56,9 @@ const classObject = reactive({
 
 
 <template>
-    <div
-        class="mx-auto flex flex-row justify-between items-start mb-2 gap-x-4 rounded-xl bg-white p-6 outline outline-black/5 dark:bg-slate-800 dark:shadow-none dark:-outline-offset-1 dark:outline-white/10">
+    <div class="grid grid-cols-12 gap-1 border border-gray-100 p-3 mb-5 rounded">
 
-        <div class="">
+        <div class="col-span-9">
             <div class="text-xl font-medium text-black dark:text-white">{{ item.title }}</div>
             <p class="text-gray-500 dark:text-gray-400">{{ item.address }}</p>
             <!-- Ratings -->
@@ -77,8 +82,11 @@ const classObject = reactive({
                 </div>
             </div>
         </div>
-
-        <img class="size-52 shrink-0" v-bind:src="'/public/images/' + item['id'] + '/main.jpg'" />
+        <div class="col-span-3 justify-items-center">
+            <div v-if="isUnsuitable" class="block bg-red-300 p-1 m-1 px-3 rounded">Квартира не подходит</div>
+            <img class="size-52 shrink-0 p-3 rounded-2xl mb-1" :class="image_danger_class" v-bind:src="'/public/images/' + item['id'] + '/main.jpg'" />
+        </div>
+        
     </div>
 </template>
 

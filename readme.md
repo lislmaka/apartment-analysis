@@ -19,6 +19,8 @@
 5. PostgreSQL
 6. Adminer
 7. Nginx
+8. Tailwindcss
+
 ## Общая техническая схема
 ![img_1](settings/files/shema1.jpg)
 

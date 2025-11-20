@@ -1,15 +1,15 @@
 @import "tailwindcss";
 @import "@nuxt/ui";
 
-.flat_items_label {
-    @apply bg-gray-500 text-white px-3  border-gray-100 rounded-sm;
-}
 .flat_items_wrapper {
-   @apply flex justify-between text-gray-600 px-3 border border-gray-100 rounded-sm;
+   @apply flex justify-between text-gray-600 px-3 border border-gray-100 rounded-sm text-sm py-1;
+}
+.flat_items_label {
+    @apply flex bg-gray-500 text-white px-3 py-1 border-gray-100 rounded-sm text-sm;
 }
 .flat_items_text {
-    @apply my-0.5 mr-1
+    @apply mr-1
 }
 .flat_items_value {
-    @apply bg-gray-300 text-black text-sm my-1 ml-1 px-2 rounded-md
+    @apply bg-gray-300 text-black text-sm ml-1 px-2 rounded-md
 }
