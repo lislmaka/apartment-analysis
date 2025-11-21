@@ -8,7 +8,6 @@
 
 <template>
   <UApp>
-    <!-- <NuxtLoadingIndicator :height="11111"/> -->
     <NuxtLayout>
       <NuxtPage />
     </NuxtLayout>

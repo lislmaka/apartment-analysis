@@ -80,9 +80,6 @@ function checkElement(index) {
     }
     return ""
 }
-const hideElement1 = computed(() => ({
-    'hidden': isUnsuitable
-}))
 </script>
 
 

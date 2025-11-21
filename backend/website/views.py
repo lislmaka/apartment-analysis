@@ -21,5 +21,17 @@ class WebsiteListAll(generics.ListCreateAPIView):
 
 
 class WebsiteList(generics.ListCreateAPIView):
-    queryset = Avito.objects.all()
+    # sort_order = request.query_params.get('your_key_name', None)
+    # queryset = Avito.objects.all()
     serializer_class = WebsiteSerializer
+
+    def get_queryset(self):
+        queryset = Avito.objects.all()
+        sort_price_order = self.request.query_params.get('sort_price_order', None)
+
+        if sort_price_order == "DESC":
+            queryset = queryset.order_by("-rating_all")
+        elif sort_price_order == "ASC":
+            queryset = queryset.order_by("rating_all")
+
+        return queryset

@@ -17,6 +17,7 @@ class WebsiteSerializer(serializers.ModelSerializer):
             "address",
             "kolichestvo_komnat",
             "obshchaya_ploshchad",
+            "district",
             "god_postroyki",
             "kapremont_date",
             "etazh_val",

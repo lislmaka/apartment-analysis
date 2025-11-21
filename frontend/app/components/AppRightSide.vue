@@ -1,54 +1,60 @@
 <script setup>
-const emit = defineEmits(['filters'])
-// const emit = defineEmits(['enlarge-text'])
-// const isChecked = computed(() => {
-//     if (!message.value) {
-//         countProjects.value = data.value.length
-//         return data.value;
-//     }
-//     const lowerCaseSearchText = message.value.toLowerCase();
-//     const d = data.value.filter(user => user.id.toString().includes(message.value));
-//     countProjects.value = d.length
-//     return d
-// })
+import { tr } from '@nuxt/ui/runtime/locale/index.js'
 
-function isChecked(event) {
-    if (event.target.checked) {
-        emit('filters', '111')
-    }
+const emit = defineEmits(['filters'])
+const props = defineProps(['sortOrder', 'districs'])
+let iconPricesSort = ref("&#8659;")
+
+function isChecked(event, val) {
+    iconPricesSort.value = iconPricesSort.value == "&#8659;" ? "&#8657;" : "&#8659;"
+    emit(event, '111')
 }
+
+// function showOrderIcon() {
+//     if (props["sortOrder"] == "DESC") {
+//         iconPricesSort.value = "i-lucide-arrow-down-1-0"
+//     } else {
+//         iconPricesSort.value = "i-lucide-arrow-down-0-1"
+//     }
+// }
 
 </script>
 <template>
-    <div class="flex flex-col rounded-xl bg-white outline outline-black/5  dark:bg-slate-800 dark:shadow-none dark:-outline-offset-1 dark:outline-white/10">
-        <div class="block bg-gray-50 p-3 text-xl font-medium text-black dark:text-white dark:bg-slate-800 dark:shadow-none dark:-outline-offset-1 dark:outline-white/10">Фильтры</div>
-        <div class="block p-3">
-            <a href="#" @click="$emit('filters', 'pizza1')">Сортировка по рейтингу</a>
-        </div>
-        <div class="block p-3">
-            <a href="#" @click="$emit('filters', 'pizza1')">Сортировка по цене</a>
-        </div>
-    </div>
-    <!-- <div class="card">
-        <div class="card-header">
-            Фильтры
-        </div>
-        <ul class="list-group list-group-flush">
-            <a href="#" class="list-group-item list-group-item-action">
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" value="" id="checkDefault"
-                        @click="isChecked($event)">
-                    <label class="form-check-label" for="checkDefault">
-                        Default checkbox
-                    </label>
+    <div class="flex flex-col space-y-5">
+        <div class="flex flex-col rounded-sm border border-gray-300">
+            <div class="bg-gray-100 p-3 text-xl font-medium text-black">Фильтры / Сортировка</div>
+            <!-- <div class="block p-3">
+            <a href="#" @click="$emit('filters', 'pizza1')">Сортировка по рейтингу {{ props["sortOrder"] }}</a>
+        </div> -->
+            <div class="flex flex-col">
+                <div class="p-2">
+                    <a href="#" @click="isChecked('filters', props['sortOrder'])">Сортировка по рейтингу <span
+                            v-html="iconPricesSort"></span>
+                        <!-- Сортировка по цене <UIcon :name="iconPricesSort" class="size-5" />
+                <span v-if="iconPricesSortFlag"><UIcon name="i-lucide-arrow-down-1-0" class="size-5" /></span>
+                <span v-else="iconPricesSortFlag"><UIcon name="i-lucide-arrow-down-0-1" class="size-5" /></span> -->
+                    </a>
                 </div>
-            </a>
-            <a href="#" class="list-group-item list-group-item-action">A second link item</a>
-            <a href="#" class="list-group-item list-group-item-action">A third link item</a>
-            <a href="#" class="list-group-item list-group-item-action">A fourth link item</a>
-            <li class="list-group-item">A second item</li>
-            <li class="list-group-item">A third item</li>
-        </ul>
-        <button @click="$emit('filters', 'pizza1')" type="button" class="btn btn-primary">Primary</button>
-    </div> -->
+                <!-- <div class="p-2">
+                    <a href="#" @click="isChecked('filters', props['sortOrder'])">Сортировка по рейтингу <span
+                            v-html="iconPricesSort"></span>
+                    </a>
+                </div> -->
+
+            </div>
+        </div>
+
+        <div class="flex flex-col rounded-sm border border-gray-300">
+            <div class="bg-gray-100 p-3 text-xl font-medium text-black">Районы</div>
+            <div class="flex justify-between" v-for="(count, district) in props['districs']">
+                <div class="p-2">{{ district }}</div>
+                <div class="bg-gray-200 m-2 px-2 rounded-sm">
+                    {{ count }}
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
 </template>
