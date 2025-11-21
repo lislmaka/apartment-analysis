@@ -22,4 +22,5 @@ class WebsiteSerializer(serializers.ModelSerializer):
             "etazh_val",
             "etazh_count",
             "kapremont_diff",
+            "is_new_lift",
         ]

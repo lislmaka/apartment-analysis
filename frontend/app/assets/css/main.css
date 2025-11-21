@@ -1,7 +1,7 @@
 @import "tailwindcss";
 @import "@nuxt/ui";
 
-.flat_items_wrapper {
+/* .flat_items_wrapper {
    @apply flex justify-between text-gray-600 px-3 border border-gray-100 rounded-sm text-sm py-1;
 }
 .flat_items_label {
@@ -12,4 +12,8 @@
 }
 .flat_items_value {
     @apply bg-gray-300 text-black text-sm ml-1 px-2 rounded-md
+} */
+
+.flat_card {
+    @apply flex flex-col flex-nowrap
 }
