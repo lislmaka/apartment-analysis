@@ -1,9 +1,19 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   devServer: {
-    host: '0.0.0.0', // Принимать подключения со всех интерфейсов
-    // port: 3000
+    port: 5173,
+    host: '0.0.0.0'  // Разрешить подключения из Docker
   },
+  // vite: {
+  //   server: {
+  //     hmr: {
+  //       protocol: 'ws',
+  //       host: 'service.frontend',           // Имя сервиса Docker
+  //       port: 5173,
+  //       clientPort: 1337         // Порт прокси (NGINX)
+  //     }
+  //   }
+  // },
   runtimeConfig: {
     baseURL: 'http://service.backend:8000/api/list/',
     public: {
