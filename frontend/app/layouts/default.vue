@@ -13,8 +13,9 @@
 </template> -->
 
 <template>
-  <UContainer>
-    <AppHeader />
+  <UContainer class="max-w-7xl mx-auto px-4">
+    <Header />
     <slot />
+    <Footer/>
   </UContainer>
 </template>

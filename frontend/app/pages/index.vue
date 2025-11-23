@@ -1,126 +1,82 @@
 <script setup>
-import AppLeftSide from '~/components/AppLeftSide.vue';
-import AppRightSide from '~/components/AppRightSide.vue';
-
-const runtimeConfig = useRuntimeConfig()
-const message = ref("")
-const paginationPageNumber = ref(1)
-// const countProjects = ref(0)
-let sortPriceOrder = ref("DESC")
-
-let url = "baseURL" in runtimeConfig ? runtimeConfig.baseURL : 'http://localhost:1337/api/list/'
-
-const { data, status, error } = await useFetch(url, {
-    query: {
-        page: paginationPageNumber,
-        sort_price_order: sortPriceOrder,
-    },
-    // lazy: true,
-})
-
-// countProjects.value = data.value["count"]
-
-// const filteredProjects = computed(() => {
-//     if (!message.value) {
-//         countProjects.value = data.value["count"]
-//         return data.value["results"];
-//     }
-//     const lowerCaseSearchText = message.value.toLowerCase();
-//     const d = data.value["results"].filter(user => user.id.toString().includes(message.value));
-//     countProjects.value = d.length
-//     console.log("--->>>", countProjects.value)
-//     data.value = d
-//     return data.value
-// })
-
-const countFlats = computed(() => {
-    if (status.value == "success") {
-        return data.value["count"]
-    }
-})
-
-const countDistrics = computed(() => {
-    let districs = {}
-    if (status.value == "success") {
-        for (let flat in data.value['results']) {
-            districs[data.value['results'][flat]["district"]] = districs[data.value['results'][flat]["district"]] ? districs[data.value['results'][flat]["district"]] + 1 : 1
-            //     if (flat["district"] in districs) {
-            //         districs[flat["district"]] += 1
-            //     } else {
-            //         districs[flat["district"]] = 1
-            //     }
-        }
-    }
-
-    return districs
-})
-
-let compare = (a, b) => {
-
-}
-function filtersEvents(val) {
-    // if (sortPriceOrder == "DESC") {
-    //     data.value['results'].sort((a, b) => b.rating_all - a.rating_all)
-    // } else {
-    //     data.value['results'].sort((a, b) => a.rating_all - b.rating_all)
-    // }
-    // // data.value['results'].sort(compare)
-    // // console.log("sortPrice = ", sortPrice.value)
-
-    // // console.log("sortPrice = ", sortPrice.value)
-    sortPriceOrder.value = sortPriceOrder.value == "DESC" ? "ASC" : "DESC"
-}
-function getPaginationPageNumber(page) {
-    paginationPageNumber.value = page
+const district_list = {
+    bgColor: "bg-green-100",
+    list: [
+        { label: "Сетевые магазины (Пятерочка, Магнит и т.д.)", value: "< 500 м." },
+        { label: "Пункты доставки (Ozon, WD)", value: "< 500 м." },
+        { label: "Аптека", value: "< 500 м." },
+        { label: "Отделение Банка", value: "< 500 м." },
+        { label: "Отделение Почты", value: "< 500 м." },
+    ],
 }
 
+const house_list = {
+    bgColor: "bg-blue-100",
+    list: [
+        { label: "Дата капремонта", value: "< 5 лет" },
+        { label: "Дата замены лифта", value: "Да?/Нет" },
+        { label: "Ступеньки перед подьездом", value: "Да?/Нет" },
+        { label: "Мусоропровод", value: "Да?/Нет" },
+        { label: "Общий коридор", value: "Да?/Нет" },
+    ],
+}
+
+const flat_list = {
+    bgColor: "bg-fuchsia-100",
+    list: [
+        { label: "Состояние туалета", value: "Хорошо/Плохо" },
+        { label: "Состояние ванной комнаты", value: "Хорошо/Плохо" },
+        { label: "Состояние балкона", value: "Хорошо/Плохо" },
+        { label: "Состояние кухни", value: "Хорошо/Плохо" },
+        { label: "Соседи сверху", value: "Хорошо/Плохо" },
+        { label: "Соседи снизу", value: "Хорошо/Плохо" },
+    ],
+}
 </script>
-
 <template>
-    <div class="block my-3">
-        <UPagination v-model:page="paginationPageNumber" :total="countFlats" />
-    </div>
-    <div class="grid grid-cols-12 gap-4">
-
-        <div v-if="data" class="col-span-9">
-            <AppFlatBlock v-for="item in data['results']" :key="item.id" :item="item" />
+    <div class="flex flex-col text-center rounded-md mt-5 p-10 space-y-10 bg-gray-100">
+        <div class="text-7xl font-bold">
+            Анализируем квартиры перед покупкой
         </div>
-        <div class="col-span-3">
-            <AppRightSide @filters="filtersEvents" :sortOrder="sortPriceOrder" :districs="countDistrics" />
+        <div class="text-3xl">
+            На основании данных из открытых источников<br> по трем составным критериям
         </div>
+        <!-- <div class="flex justify-center space-x-5">
+            <BlockInfoBlockText>Стостояние квартиры</BlockInfoBlockText>
+            <BlockInfoBlockText>Состояние дома</BlockInfoBlockText>
+            <BlockInfoBlockText>Инфраструктура района</BlockInfoBlockText>
+        </div> -->
     </div>
-    <div class="block my-3">
-        <UPagination v-model:page="paginationPageNumber" :total="countFlats" />
-    </div>
-    <!-- <p v-if="status === 'pending'">Loading...</p>
-    <p v-if="error">{{ error.message }}</p> -->
-    <!-- <div class="">
-        <div>
-            {{ paginationPageNumber }}
-            <AppPagination :count="countProjects" @getpaginationPageNumber="getPaginationPageNumber" />
-
-        </div>
-        <div class="row">
-            <div class="col-9">
-                <div v-if="data">
-                    <AppFlatBlock2 v-for="item in filteredProjects" :key="item.id" :item="item" />
-                </div>
-                <p v-if="pending">Loading...</p>
-                <p v-if="error">{{ error.message }}</p>
-
-            </div>
-            <div class="col-3">
-                <div class="row  mb-1">
-                    <div class="col-10">
-                        <input v-model="message" class="form-control" type="text">
-                    </div>
-                    <div class="col-2">
-                        <h4><span class="badge text-bg-secondary">{{ countProjects }}</span></h4>
-                    </div>
-                </div>
-                <AppRightSide @filters="filtersEvents" />
-            </div>
+    <div class="flex flex-col p-10 gap-5">
+        <BlockHeaderText>
+            <template #primaryText>Критерии оценки при покупке квартиры</template>
+            <template #secondaryText>Суммарно учитывается более 15 характеристик</template>
+            <!-- <template v-slot="secondaryText">Критерии оценки</template> -->
+        </BlockHeaderText>
+        <div class="grid grid-cols-3 justify-around gap-5">
+            <BlockInfoList :title="'Инфраструктура района'" :list="district_list"></BlockInfoList>
+            <BlockInfoList :title="'Стостояние дома'" :list="house_list"></BlockInfoList>
+            <BlockInfoList :title="'Состояние квартиры'" :list="flat_list"></BlockInfoList>
         </div>
     </div>
- -->
 </template>
+
+<!-- <template>
+    <div class="flex justify-between border border-gray-300 rounded mt-5 p-5">
+        <div class="flex flex-col space-y-7">
+            <div class="text-7xl font-bold">
+                Анализируем квартиры перед покупкой
+            </div>
+            <div class="text-3xl">
+                На основании данных из открытых источников по трем составным критериям
+            </div>
+            <div class="text-3xl">
+                
+            </div>
+        </div>
+
+        <div class="w-sm">
+            <img class="shrink-0 rounded-2xl shadow-2xl" :src="'/public/frontend/main.jpg'" alt="">
+        </div>
+    </div>
+</template> -->
