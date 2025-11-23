@@ -1,5 +1,5 @@
 <script setup>
-
+const { globalCounter, globalCounter1 } = useGlobalData()
 const runtimeConfig = useRuntimeConfig()
 const message = ref("")
 const paginationPageNumber = ref(1)
@@ -17,6 +17,7 @@ const { data, status, error } = await useFetch(url, {
 
 const countFlats = computed(() => {
     if (status.value == "success") {
+        globalCounter1.value = data.value["count"]
         return data.value["count"]
     }
 })
@@ -46,7 +47,7 @@ function getPaginationPageNumber(page) {
     <div class="block my-3">
         <UPagination v-model:page="paginationPageNumber" :total="countFlats" />
     </div>
-    <div class="grid grid-cols-12 gap-4">
+    <div class="grid grid-cols-12 gap-5">
 
         <div v-if="data" class="col-span-9">
             <FlatBlock v-for="item in data['results']" :key="item.id" :item="item" />

@@ -1,48 +1,14 @@
 <script setup>
+const { fields_general, fields_ratings, fields_house, fields_district, main } = useGlobalData()
+
 const props = defineProps(['item'])
 let isUnsuitable = ref(false)
-let isHideValueOfParam = ref(false)
 
-const fields_general = {
-    "price": "Цена",
-    // "address": "Адрес",
-    "kolichestvo_komnat": "Кол-во комнат",
-    "obshchaya_ploshchad": "Общая площадь",
-    "god_postroyki": "Год постройки",
-    // "kapremont_date": "Дата капремонта",
-    "etazh_val": "Этаж",
-    "etazh_count": "Этажей",
-    "district": "Район",
-}
-const fields_ratings = {
-    "rating_all": "Суммарный",
-    "rating_house": "Дом",
-    "rating_flat": "Квартира",
-    "rating_infrastructure": "Инфраструктура",
-}
-const fields_house = {
-    "kapremont_date": "Дата капремонта",
-    "kapremont_diff": "До капремонта",
-    "is_new_lift": "Новый лифт",
-}
-
-const main = {
-    "ratings": {
-        "label": "Рейтинг",
-        "data": fields_ratings,
-    },
-    "general": {
-        "label": "Информация",
-        "data": fields_general,
-    },
-    "house": {
-        "label": "Дом",
-        "data": fields_house,
-    },
-}
 
 const badElementColor = "bg-red-100"
 const goodElementColor = "bg-green-100"
+const warnigElementColor = "bg-orange-100"
+const hideElement = "hidden"
 
 function checkElement(index) {
     if (index === "kapremont_date") {
@@ -62,22 +28,43 @@ function checkElement(index) {
         }
     }
     else if (index === "price") {
-        if (props["item"]["price"] > 5000000) {
+        if (props["item"]["price"] > 6000000) {
             isUnsuitable = true
             return badElementColor
         } else {
             return goodElementColor
         }
     }
-    else if (index === "is_new_lift") {
-        isHideValueOfParam = true
-        if (props["item"]["is_new_lift"] === false) {
+    // is_musoroprovod
+    else if (index === "is_musoroprovod") {
+        if (props["item"]["is_musoroprovod"] === false) {
+            props["item"]["is_musoroprovod"] = "Нет"
             isUnsuitable = true
             return badElementColor
         } else {
+            props["item"]["is_musoroprovod"] = "Да"
             return goodElementColor
         }
-
+    }
+    else if (index === "is_new_lift") {
+        if (props["item"]["is_new_lift"] === false) {
+            props["item"]["is_new_lift"] = "Нет"
+            isUnsuitable = true
+            return badElementColor
+        } else {
+            props["item"]["is_new_lift"] = "Да"
+            return goodElementColor
+        }
+    }
+    else if (index in fields_district) {
+        if (props["item"][index] === null) {
+            return hideElement
+        }
+        if (parseInt(props["item"][index]) <= 500) {
+            return goodElementColor
+        } else {
+            return warnigElementColor
+        }
     }
     return ""
 }
@@ -86,7 +73,6 @@ function checkElement(index) {
 
 <template>
     <div class="flex border border-gray-300 p-3 mb-5 rounded-sm">
-
         <div class="flex flex-col flex-nowrap w-3/4 gap-1">
             <div class="text-xl font-medium text-black dark:text-white">{{ item.title }}</div>
             <p class="text-gray-500 dark:text-gray-400">{{ item.address }}</p>
@@ -96,7 +82,7 @@ function checkElement(index) {
                 <div class="flex justify-between border border-gray-300 rounded-sm text-sm space-x-1"
                     :class="checkElement(index)" v-for="(value, index) in cat.data">
                     <div class="px-2 py-1">{{ value }}</div>
-                    <div class="bg-gray-300 rounded-r-sm px-2 py-1" :class="{ 'hidden': isHideValueOfParam }">
+                    <div class="bg-gray-300 rounded-r-sm px-2 py-1">
                         {{ item[index] }}
                     </div>
                 </div>
